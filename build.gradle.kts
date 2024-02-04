@@ -11,6 +11,16 @@ java {
 	targetCompatibility = JavaVersion.VERSION_1_8
 }
 
+kotlin {
+	compilerOptions {
+		freeCompilerArgs.add("-Xjvm-default=all")
+	}
+}
+
+dependencies {
+	testImplementation("org.testng:testng:6.9.6")
+}
+
 publishing {
 	publications {
 		register<MavenPublication>("release") {
