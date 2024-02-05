@@ -52,8 +52,11 @@ class Distance(val distanceUnit: DistanceUnit = DistanceUnits.MILLIMETER, value:
 	override fun hashCode(): Int = intoMillimeters().value.hashCode() // ignores power
 
 	companion object {
+		@JvmStatic
 		val NEGATIVE_INFINITY: Distance = Distance(value = Double.NEGATIVE_INFINITY)
+		@JvmStatic
 		val POSITIVE_INFINITY: Distance = Distance(value = Double.POSITIVE_INFINITY)
+		@JvmStatic
 		val NaN: Distance = Distance(value = Double.NaN)
 	}
 

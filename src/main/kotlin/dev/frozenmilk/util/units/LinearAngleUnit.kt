@@ -31,8 +31,8 @@ class LinearAngle(val linearAngleUnit: LinearAngleUnit = LinearAngleUnits.RADIAN
 	override fun div(divisor: Double) = LinearAngle(linearAngleUnit, value / divisor, power)
 	override fun div(reifiedUnit: ReifiedUnit<LinearAngleUnit, LinearAngle>) = LinearAngle(linearAngleUnit, value / reifiedUnit.into(linearAngleUnit).value, power - reifiedUnit.power)
 	override fun findShortestDistance(reifiedUnit: ReifiedUnit<LinearAngleUnit, LinearAngle>): ReifiedUnit<LinearAngleUnit, LinearAngle> {
-		if (power == reifiedUnit.power) return LinearAngle(linearAngleUnit, reifiedUnit.into(linearAngleUnit).value - this.value, power)
-		else throw UnsupportedOperationException("Cannot find shortest distance between LinearAngles with different powers")
+			if (power == reifiedUnit.power) return LinearAngle(linearAngleUnit, reifiedUnit.into(linearAngleUnit).value - this.value, power)
+			else throw UnsupportedOperationException("Cannot find shortest distance between LinearAngles with different powers")
 	}
 
 	override fun abs() = LinearAngle(linearAngleUnit, abs(value), power)
@@ -54,8 +54,11 @@ class LinearAngle(val linearAngleUnit: LinearAngleUnit = LinearAngleUnits.RADIAN
 	override fun compareTo(other: ReifiedUnit<LinearAngleUnit, LinearAngle>) = value.compareTo(other.into(linearAngleUnit).value) // ignores power
 
 	companion object {
+		@JvmStatic
 		val NEGATIVE_INFINITY: LinearAngle = LinearAngle(value = Double.NEGATIVE_INFINITY)
+		@JvmStatic
 		val POSITIVE_INFINITY: LinearAngle = LinearAngle(value = Double.POSITIVE_INFINITY)
+		@JvmStatic
 		val NaN: LinearAngle = LinearAngle(value = Double.NaN)
 	}
 

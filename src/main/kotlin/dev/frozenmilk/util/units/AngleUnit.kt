@@ -68,8 +68,11 @@ class Angle(val angleUnit: AngleUnit = AngleUnits.RADIAN, value: Double = 0.0, p
 	override fun compareTo(other: ReifiedUnit<AngleUnit, Angle>) = value.compareTo(other.into(angleUnit).value) // ignores power
 
 	companion object {
+		@JvmStatic
 		val NEGATIVE_INFINITY: Angle = Angle(value = Double.NEGATIVE_INFINITY)
+		@JvmStatic
 		val POSITIVE_INFINITY: Angle = Angle(value = Double.POSITIVE_INFINITY)
+		@JvmStatic
 		val NaN: Angle = Angle(value = Double.NaN)
 	}
 
