@@ -1,10 +1,10 @@
 package dev.frozenmilk.util.units.position
 
-import dev.frozenmilk.util.units.DistanceUnit
-import dev.frozenmilk.util.units.DistanceUnits
-import dev.frozenmilk.util.units.Distance
-import dev.frozenmilk.util.units.Angle
-import dev.frozenmilk.util.units.AngleUnits
+import dev.frozenmilk.util.units.distance.DistanceUnit
+import dev.frozenmilk.util.units.distance.DistanceUnits
+import dev.frozenmilk.util.units.distance.Distance
+import dev.frozenmilk.util.units.angle.Angle
+import dev.frozenmilk.util.units.angle.AngleUnits
 import java.util.Objects
 import kotlin.math.atan2
 import kotlin.math.cos
@@ -25,10 +25,8 @@ class Vector2D @JvmOverloads constructor(val x: Distance = Distance(DistanceUnit
 
 	/**
 	 * polar constructor
-	 *
-	 * internal handler
 	 */
-	private constructor(units: DistanceUnit, r: Double, t: Angle) : this(units, r * cos(t.intoRadians().value), r * sin(t.intoRadians().value))
+	constructor(magnitude: Distance, t: Angle) : this(magnitude.distanceUnit, magnitude.value * cos(t.intoRadians().value), magnitude.value * sin(t.intoRadians().value))
 
 	/**
 	 * non-mutating
@@ -75,6 +73,7 @@ class Vector2D @JvmOverloads constructor(val x: Distance = Distance(DistanceUnit
 	 * non-mutating
 	 */
 	infix fun rotate(angle: Angle): Vector2D {
+		@Suppress("NAME_SHADOWING")
 		val angle = angle.into(AngleUnits.RADIAN)
 		val cos = cos(angle.value)
 		val sin = sin(angle.value)
@@ -84,12 +83,14 @@ class Vector2D @JvmOverloads constructor(val x: Distance = Distance(DistanceUnit
 	/**
 	 * non-mutating
 	 */
-	fun normalise(length: Distance = Distance(DistanceUnits.MILLIMETER, 1.0)) = times((length / magnitude).value)
+	fun normalise(length: Distance = Distance(DistanceUnits.MILLIMETER, 1.0)) = Vector2D(length, theta)
 
 	/**
 	 * non-mutating
 	 *
-	 * The resulting [Distance] can be transformed using [ReifiedLinearUnit.into] in order to have the results behave as though all the inputs were of that unit type
+	 * The resulting [dev.frozenmilk.util.units.distance.SquareDistance] can be transformed using [dev.frozenmilk.util.units.distance.SquareDistance.into] in order to have the results behave as though all the inputs were of that unit type
+	 *
+	 * the scalar result can then be retrieved using [dev.frozenmilk.util.units.distance.SquareDistance.value]
 	 */
 	infix fun dot(vector2D: Vector2D) = x * vector2D.x + y * vector2D.y
 

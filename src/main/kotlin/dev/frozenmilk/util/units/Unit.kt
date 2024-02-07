@@ -4,12 +4,12 @@ import kotlin.math.pow
 
 interface Unit<U: Unit<U>> {
 	val toCommonRatio: Double
-	fun into(unit: U, value: Double, power: Int): Double = if (unit == this) value else unit.fromCommonUnit(toCommonUnit(value, power), power)
-	fun toCommonUnit(value: Double, power: Int): Double = value * (toCommonRatio.pow(power))
-	fun fromCommonUnit(value: Double, power: Int): Double = value / (toCommonRatio.pow(power))
+	fun into(unit: U, value: Double): Double = if (unit == this) value else unit.fromCommonUnit(toCommonUnit(value))
+	fun toCommonUnit(value: Double): Double = value * toCommonRatio
+	fun fromCommonUnit(value: Double): Double = value / toCommonRatio
 }
 
-abstract class ReifiedUnit<U: Unit<U>, RU: ReifiedUnit<U, RU>>(val value: Double, val power: Int) : Number(), Comparable<ReifiedUnit<U, RU>> {
+abstract class ReifiedUnit<U: Unit<U>, RU: ReifiedUnit<U, RU>>(val value: Double) : Number(), Comparable<ReifiedUnit<U, RU>> {
 	/**
 	 * non-mutating
 	 */
@@ -38,22 +38,22 @@ abstract class ReifiedUnit<U: Unit<U>, RU: ReifiedUnit<U, RU>>(val value: Double
 	 * non-mutating
 	 */
 	abstract operator fun times(multiplier: Double): ReifiedUnit<U, RU>
-	/**
-	 * non-mutating
-	 */
-	abstract operator fun times(reifiedUnit: ReifiedUnit<U, RU>): ReifiedUnit<U, RU>
+//	/**
+//	 * non-mutating
+//	 */
+//	abstract operator fun times(reifiedUnit: ReifiedUnit<U, RU>): ReifiedUnit<U, RU>
 	/**
 	 * non-mutating
 	 */
 	abstract operator fun div(divisor: Double): ReifiedUnit<U, RU>
-	/**
-	 * non-mutating
-	 */
-	abstract operator fun div(reifiedUnit: ReifiedUnit<U, RU>): ReifiedUnit<U, RU>
-	/**
-	 * non-mutating
-	 */
-	abstract fun findShortestDistance(reifiedUnit: ReifiedUnit<U, RU>): ReifiedUnit<U, RU>
+//	/**
+//	 * non-mutating
+//	 */
+//	abstract operator fun div(reifiedUnit: ReifiedUnit<U, RU>): ReifiedUnit<U, RU>
+//	/**
+//	 * non-mutating
+//	 */
+//	abstract fun findShortestDistance(reifiedUnit: ReifiedUnit<U, RU>): ReifiedUnit<U, RU>
 	/**
 	 * non-mutating
 	 */
@@ -70,15 +70,15 @@ abstract class ReifiedUnit<U: Unit<U>, RU: ReifiedUnit<U, RU>>(val value: Double
 	 * non-mutating
 	 */
 	abstract fun coerceIn(minimumValue: ReifiedUnit<U, RU>, maximumValue: ReifiedUnit<U, RU>): ReifiedUnit<U, RU>
-	// todo review
+//	// todo review
+////	/**
+////	 * non-mutating
+////	 */
+////	abstract fun sqrt(): ReifiedUnit<U, RU>
 //	/**
 //	 * non-mutating
 //	 */
-//	abstract fun sqrt(): ReifiedUnit<U, RU>
-	/**
-	 * non-mutating
-	 */
-	abstract fun pow(n: Int): ReifiedUnit<U, RU>
+//	abstract fun pow(n: Int): ReifiedUnit<U, RU>
 	abstract override operator fun compareTo(other: ReifiedUnit<U, RU>): Int
 	abstract override fun toString(): String
 	abstract override fun equals(other: Any?): Boolean

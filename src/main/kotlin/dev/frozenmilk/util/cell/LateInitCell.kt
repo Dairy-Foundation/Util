@@ -3,7 +3,7 @@ package dev.frozenmilk.util.cell
 open class LateInitCell<T> (protected var internalCell: Cell<T?>, protected val error: String = "Attempted to obtain a null value from an unsafe Cell") : CellBase<T>() {
 	@JvmOverloads
 	constructor(ref: T? = null, error: String = "Attempted to obtain a null value from an unsafe Cell") : this(InnerCell(ref), error)
-	override fun get(): T  {
+	override fun get(): T {
 		lastGet = System.nanoTime()
 		return internalCell.get() ?: throw IllegalStateException(error)
 	}

@@ -1,6 +1,7 @@
 package dev.frozenmilk.util.units.orientation
 
-import dev.frozenmilk.util.units.Angle
+import dev.frozenmilk.util.units.angle.Angle
+import dev.frozenmilk.util.units.angle.AngleUnits
 
 /**
  * see [rotations using the right hand rule](https://en.wikipedia.org/wiki/Right-hand_rule#Rotations)
@@ -9,7 +10,7 @@ import dev.frozenmilk.util.units.Angle
  * @property yRot the rotation of the robot about the positive y-axis of the field
  * @property zRot the rotation of the robot about the positive z-axis of the field
  */
-class AngleBasedRobotOrientation @JvmOverloads constructor(val xRot: Angle = Angle(), val yRot: Angle = Angle(), val zRot: Angle = Angle()) {
+class AngleBasedRobotOrientation @JvmOverloads constructor(val xRot: Angle = Angle(AngleUnits.RADIAN), val yRot: Angle = Angle(AngleUnits.RADIAN), val zRot: Angle = Angle(AngleUnits.RADIAN)) {
 	enum class Axis {
 		X,
 		Y,
