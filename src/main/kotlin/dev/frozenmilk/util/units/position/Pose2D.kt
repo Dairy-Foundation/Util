@@ -4,9 +4,10 @@ import dev.frozenmilk.util.units.distance.DistanceUnit
 import dev.frozenmilk.util.units.distance.DistanceUnits
 import dev.frozenmilk.util.units.angle.Angle
 import dev.frozenmilk.util.units.angle.AngleUnits
+import dev.frozenmilk.util.units.angle.Wrapping
 import java.util.Objects
 
-class Pose2D @JvmOverloads constructor(val vector2D: Vector2D = Vector2D(), val heading: Angle = Angle(AngleUnits.RADIAN)) {
+class Pose2D @JvmOverloads constructor(val vector2D: Vector2D = Vector2D(), val heading: Angle = Angle(AngleUnits.RADIAN, Wrapping.WRAPPING)) {
 	/**
 	 * non-mutating
 	 */
@@ -58,12 +59,12 @@ class Pose2D @JvmOverloads constructor(val vector2D: Vector2D = Vector2D(), val 
 	override fun hashCode() = Objects.hash(vector2D, heading)
 }
 
-fun millimeterPose(x: Double = 0.0, y: Double = 0.0, heading: Angle = Angle(AngleUnits.RADIAN)) = Pose2D(millimeterVector(x, y), heading)
-fun inchPose(x: Double = 0.0, y: Double = 0.0, heading: Angle = Angle(AngleUnits.RADIAN)) = Pose2D(inchVector(x, y), heading)
-fun meterPose(x: Double = 0.0, y: Double = 0.0, heading: Angle = Angle(AngleUnits.RADIAN)) = Pose2D(meterVector(x, y), heading)
-fun footPose(x: Double = 0.0, y: Double = 0.0, heading: Angle = Angle(AngleUnits.RADIAN)) = Pose2D(footVector(x, y), heading)
+fun millimeterPose(x: Double = 0.0, y: Double = 0.0, heading: Angle = Angle(AngleUnits.RADIAN, Wrapping.WRAPPING)) = Pose2D(millimeterVector(x, y), heading)
+fun inchPose(x: Double = 0.0, y: Double = 0.0, heading: Angle = Angle(AngleUnits.RADIAN, Wrapping.WRAPPING)) = Pose2D(inchVector(x, y), heading)
+fun meterPose(x: Double = 0.0, y: Double = 0.0, heading: Angle = Angle(AngleUnits.RADIAN, Wrapping.WRAPPING)) = Pose2D(meterVector(x, y), heading)
+fun footPose(x: Double = 0.0, y: Double = 0.0, heading: Angle = Angle(AngleUnits.RADIAN, Wrapping.WRAPPING)) = Pose2D(footVector(x, y), heading)
 
-fun millimeterPose(vector2D: Vector2D = millimeterVector(), heading: Angle = Angle(AngleUnits.RADIAN)) = Pose2D(vector2D.into(DistanceUnits.MILLIMETER), heading)
-fun inchPose(vector2D: Vector2D = inchVector(), heading: Angle = Angle(AngleUnits.RADIAN)) = Pose2D(vector2D.into(DistanceUnits.INCH), heading)
-fun meterPose(vector2D: Vector2D = meterVector(), heading: Angle = Angle(AngleUnits.RADIAN)) = Pose2D(vector2D.into(DistanceUnits.MILLIMETER), heading)
-fun footPose(vector2D: Vector2D = footVector(), heading: Angle = Angle(AngleUnits.RADIAN)) = Pose2D(vector2D.into(DistanceUnits.MILLIMETER), heading)
+fun millimeterPose(vector2D: Vector2D = millimeterVector(), heading: Angle = Angle(AngleUnits.RADIAN, Wrapping.WRAPPING)) = Pose2D(vector2D.into(DistanceUnits.MILLIMETER), heading)
+fun inchPose(vector2D: Vector2D = inchVector(), heading: Angle = Angle(AngleUnits.RADIAN, Wrapping.WRAPPING)) = Pose2D(vector2D.into(DistanceUnits.INCH), heading)
+fun meterPose(vector2D: Vector2D = meterVector(), heading: Angle = Angle(AngleUnits.RADIAN, Wrapping.WRAPPING)) = Pose2D(vector2D.into(DistanceUnits.MILLIMETER), heading)
+fun footPose(vector2D: Vector2D = footVector(), heading: Angle = Angle(AngleUnits.RADIAN, Wrapping.WRAPPING)) = Pose2D(vector2D.into(DistanceUnits.MILLIMETER), heading)

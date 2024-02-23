@@ -1,15 +1,18 @@
 package dev.frozenmilk.util.units
 
-import kotlin.math.pow
-
 interface Unit<U: Unit<U>> {
+	/**
+	 * value * toCommonRatio = value in common units
+	 *
+	 * @see toCommonUnit
+	 */
 	val toCommonRatio: Double
 	fun into(unit: U, value: Double): Double = if (unit == this) value else unit.fromCommonUnit(toCommonUnit(value))
 	fun toCommonUnit(value: Double): Double = value * toCommonRatio
 	fun fromCommonUnit(value: Double): Double = value / toCommonRatio
 }
 
-abstract class ReifiedUnit<U: Unit<U>, RU: ReifiedUnit<U, RU>>(val value: Double) : Number(), Comparable<ReifiedUnit<U, RU>> {
+abstract class ReifiedUnit<U: Unit<U>, RU: ReifiedUnit<U, RU>>(val unit: U, val value: Double) : Comparable<RU> {
 	/**
 	 * non-mutating
 	 */
@@ -21,65 +24,72 @@ abstract class ReifiedUnit<U: Unit<U>, RU: ReifiedUnit<U, RU>>(val value: Double
 	/**
 	 * non-mutating
 	 */
-	abstract operator fun plus(reifiedUnit: ReifiedUnit<U, RU>): ReifiedUnit<U, RU>
+	abstract operator fun plus(reifiedUnit: RU): RU
 	/**
 	 * non-mutating
 	 */
-	abstract operator fun minus(reifiedUnit: ReifiedUnit<U, RU>): ReifiedUnit<U, RU>
+	abstract operator fun minus(reifiedUnit: RU): RU
 	/**
 	 * non-mutating
 	 */
-	abstract operator fun unaryPlus(): ReifiedUnit<U, RU>
+	abstract operator fun unaryPlus(): RU
 	/**
 	 * non-mutating
 	 */
-	abstract operator fun unaryMinus(): ReifiedUnit<U, RU>
+	abstract operator fun unaryMinus(): RU
 	/**
 	 * non-mutating
 	 */
-	abstract operator fun times(multiplier: Double): ReifiedUnit<U, RU>
-//	/**
-//	 * non-mutating
-//	 */
-//	abstract operator fun times(reifiedUnit: ReifiedUnit<U, RU>): ReifiedUnit<U, RU>
+	abstract operator fun times(multiplier: Double): RU
 	/**
 	 * non-mutating
 	 */
-	abstract operator fun div(divisor: Double): ReifiedUnit<U, RU>
-//	/**
-//	 * non-mutating
-//	 */
-//	abstract operator fun div(reifiedUnit: ReifiedUnit<U, RU>): ReifiedUnit<U, RU>
-//	/**
-//	 * non-mutating
-//	 */
-//	abstract fun findShortestDistance(reifiedUnit: ReifiedUnit<U, RU>): ReifiedUnit<U, RU>
+	abstract operator fun times(multiplier: RU): RU
 	/**
 	 * non-mutating
 	 */
-	abstract fun abs(): ReifiedUnit<U, RU>
+	abstract operator fun div(divisor: Double): RU
 	/**
 	 * non-mutating
 	 */
-	abstract fun coerceAtLeast(minimumValue: ReifiedUnit<U, RU>): ReifiedUnit<U, RU>
+	abstract operator fun div(divisor: RU): RU
 	/**
 	 * non-mutating
 	 */
-	abstract fun coerceAtMost(maximumValue: ReifiedUnit<U, RU>): ReifiedUnit<U, RU>
+	abstract fun pow(n: Double): RU
 	/**
 	 * non-mutating
 	 */
-	abstract fun coerceIn(minimumValue: ReifiedUnit<U, RU>, maximumValue: ReifiedUnit<U, RU>): ReifiedUnit<U, RU>
-//	// todo review
-////	/**
-////	 * non-mutating
-////	 */
-////	abstract fun sqrt(): ReifiedUnit<U, RU>
-//	/**
-//	 * non-mutating
-//	 */
-//	abstract fun pow(n: Int): ReifiedUnit<U, RU>
-	abstract override operator fun compareTo(other: ReifiedUnit<U, RU>): Int
+	abstract fun pow(n: Int): RU
+	/**
+	 * non-mutating
+	 */
+	abstract fun sqrt(): RU
+	/**
+	 * non-mutating
+	 */
+	abstract fun abs(): RU
+	/**
+	 * returns the error difference this and [target], for some units, this may be the same as target - this
+	 */
+	abstract fun findError(target: RU): RU
+	/**
+	 * non-mutating
+	 */
+	abstract fun coerceAtLeast(minimumValue: RU): RU
+	/**
+	 * non-mutating
+	 */
+	abstract fun coerceAtMost(maximumValue: RU): RU
+	/**
+	 * non-mutating
+	 */
+	abstract fun coerceIn(minimumValue: RU, maximumValue: RU): RU
+	abstract override operator fun compareTo(other: RU): Int
+	fun lessThan(other: RU) = compareTo(other) < 0
+	fun lessThanEqualTo(other: RU) = compareTo(other) <= 0
+	fun greaterThan(other: RU) = compareTo(other) > 0
+	fun greaterThanEqualTo(other: RU) = compareTo(other) >= 0
 	abstract override fun toString(): String
 	abstract override fun equals(other: Any?): Boolean
 	abstract override fun hashCode(): Int
@@ -88,10 +98,4 @@ abstract class ReifiedUnit<U: Unit<U>, RU: ReifiedUnit<U, RU>>(val value: Double
 	// Number
 	//
 	fun isNaN(): Boolean = value.isNaN()
-	override fun toByte() = value.toInt().toByte()
-	override fun toDouble() = value
-	override fun toFloat() = value.toFloat()
-	override fun toInt() = value.toInt()
-	override fun toLong() = value.toLong()
-	override fun toShort() = value.toInt().toShort()
 }

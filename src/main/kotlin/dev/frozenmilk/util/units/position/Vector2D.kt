@@ -1,10 +1,11 @@
 package dev.frozenmilk.util.units.position
 
-import dev.frozenmilk.util.units.distance.DistanceUnit
-import dev.frozenmilk.util.units.distance.DistanceUnits
-import dev.frozenmilk.util.units.distance.Distance
 import dev.frozenmilk.util.units.angle.Angle
 import dev.frozenmilk.util.units.angle.AngleUnits
+import dev.frozenmilk.util.units.angle.Wrapping
+import dev.frozenmilk.util.units.distance.Distance
+import dev.frozenmilk.util.units.distance.DistanceUnit
+import dev.frozenmilk.util.units.distance.DistanceUnits
 import java.util.Objects
 import kotlin.math.atan2
 import kotlin.math.cos
@@ -15,7 +16,7 @@ class Vector2D @JvmOverloads constructor(val x: Distance = Distance(DistanceUnit
 	/**
 	 * angle of the vector, always a [Angle] of type [AngleUnits.RADIAN] under the hood
 	 */
-	val theta: Angle by lazy { Angle(AngleUnits.RADIAN, atan2(y.intoMillimeters().value, x.intoMillimeters().value)) }
+	val theta: Angle by lazy { Angle(AngleUnits.RADIAN, Wrapping.WRAPPING, atan2(y.intoMillimeters().value, x.intoMillimeters().value)) }
 
 	/**
 	 * length of the vector, always a [Distance] of type [DistanceUnits.MILLIMETER] under the hood
@@ -26,7 +27,7 @@ class Vector2D @JvmOverloads constructor(val x: Distance = Distance(DistanceUnit
 	/**
 	 * polar constructor
 	 */
-	constructor(magnitude: Distance, t: Angle) : this(magnitude.distanceUnit, magnitude.value * cos(t.intoRadians().value), magnitude.value * sin(t.intoRadians().value))
+	constructor(magnitude: Distance, t: Angle) : this(magnitude.unit, magnitude.value * cos(t.intoRadians().value), magnitude.value * sin(t.intoRadians().value))
 
 	/**
 	 * non-mutating
