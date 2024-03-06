@@ -36,10 +36,10 @@ class Distance (unit: DistanceUnit, value: Double = 0.0) : ReifiedUnit<DistanceU
 	override fun coerceAtLeast(minimumValue: Distance) = Distance(unit, value.coerceAtLeast(minimumValue[unit]))
 	override fun coerceAtMost(maximumValue: Distance) = Distance(unit, value.coerceAtMost(maximumValue[unit]))
 	override fun coerceIn(minimumValue: Distance, maximumValue: Distance) = Distance(unit, value.coerceIn(minimumValue[unit], maximumValue[unit]))
-	override fun compareTo(other: Distance): Int = value.compareTo(other[unit]) // ignores power
+	override fun compareTo(other: Distance): Int = value.compareTo(other[unit])
 	override fun toString() = "$value $unit"
 	override fun equals(other: Any?): Boolean = other is Distance && abs((this - other).value) < 1e-12
-	override fun hashCode(): Int = intoMillimeters().value.hashCode() // ignores power
+	override fun hashCode(): Int = intoMillimeters().value.hashCode()
 
 	companion object {
 		@JvmField
