@@ -4,3 +4,8 @@ package dev.frozenmilk.util.modifier
 fun interface Modifier<T> {
 	fun modify(t: T): T
 }
+
+@FunctionalInterface
+fun interface BiModifier<T, U> {
+	fun modify(t: T, u: U): T
+}
