@@ -16,6 +16,7 @@ import kotlin.math.sqrt
 interface AngleUnit : Unit<AngleUnit> {
 	val wrapAt: Double
 	fun mod(value: Double) = value.mod(wrapAt)
+	override fun common() = AngleUnits.RADIAN
 }
 
 enum class AngleUnits(override val toCommonRatio: Double, override val wrapAt: Double) : AngleUnit {

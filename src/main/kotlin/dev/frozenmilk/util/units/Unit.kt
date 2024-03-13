@@ -10,6 +10,10 @@ interface Unit<U: Unit<U>> {
 	fun into(unit: U, value: Double): Double = if (unit == this) value else unit.fromCommonUnit(toCommonUnit(value))
 	fun toCommonUnit(value: Double): Double = value * toCommonRatio
 	fun fromCommonUnit(value: Double): Double = value / toCommonRatio
+	/**
+	 * the common unit
+	 */
+	fun common(): U
 }
 
 abstract class ReifiedUnit<U: Unit<U>, RU: ReifiedUnit<U, RU>>(val unit: U, val value: Double) : Comparable<RU> {
@@ -17,6 +21,10 @@ abstract class ReifiedUnit<U: Unit<U>, RU: ReifiedUnit<U, RU>>(val unit: U, val 
 	 * non-mutating
 	 */
 	abstract fun into(unit: U): RU
+	/**
+	 * non-mutating
+	 */
+	fun intoCommon() = into(unit.common())
 	/**
 	 * non-mutating
 	 */

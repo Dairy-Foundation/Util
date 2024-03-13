@@ -10,7 +10,9 @@ import kotlin.math.sqrt
 /**
  * common value is [DistanceUnits.MILLIMETER]
  */
-interface DistanceUnit : Unit<DistanceUnit>
+interface DistanceUnit : Unit<DistanceUnit> {
+	override fun common() = DistanceUnits.MILLIMETER
+}
 enum class DistanceUnits(override val toCommonRatio: Double) : DistanceUnit {
 	METER(1000.0),
 	MILLIMETER(1.0),
@@ -18,7 +20,7 @@ enum class DistanceUnits(override val toCommonRatio: Double) : DistanceUnit {
 	FOOT(304.8),
 }
 
-class Distance (unit: DistanceUnit, value: Double = 0.0) : ReifiedUnit<DistanceUnit, Distance>(unit, value) {
+class Distance (unit: DistanceUnit = DistanceUnits.MILLIMETER, value: Double = 0.0) : ReifiedUnit<DistanceUnit, Distance>(unit, value) {
 	override fun into(unit: DistanceUnit) = if (unit == this.unit) this else Distance(unit, this.unit.into(unit, value))
 	override fun plus(reifiedUnit: Distance) = Distance(unit, value + reifiedUnit[unit])
 	override fun minus(reifiedUnit: Distance) = Distance(unit, value - reifiedUnit[unit])
