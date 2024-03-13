@@ -29,23 +29,35 @@ enum class Wrapping {
 	LINEAR
 }
 
-class Angle @JvmOverloads constructor(unit: AngleUnit, val wrapping: Wrapping, value: Double = 0.0) : ReifiedUnit<AngleUnit, Angle>(unit, unit.run { if(wrapping == Wrapping.WRAPPING) this.mod(value) else value }) {
+class Angle @JvmOverloads constructor(unit: AngleUnit = AngleUnits.RADIAN, val wrapping: Wrapping = Wrapping.WRAPPING, value: Double = 0.0) : ReifiedUnit<AngleUnit, Angle>(unit, unit.run { if(wrapping == Wrapping.WRAPPING) this.mod(value) else value }) {
 	override fun into(unit: AngleUnit) = if (unit == this.unit) this else Angle(unit, wrapping, this.unit.into(unit, value))
 	fun into(wrapping: Wrapping) = if (wrapping == this.wrapping) this else Angle(unit, wrapping, value)
+	/**
+	 * if either this [wrapping] or [reifiedUnit]'s [wrapping] is [Wrapping.LINEAR], the result will be [Wrapping.LINEAR]
+	 */
 	override fun plus(reifiedUnit: Angle) = Angle(unit, resultWrapping(reifiedUnit), value + reifiedUnit[unit])
+	/**
+	 * if either this [wrapping] or [reifiedUnit]'s [wrapping] is [Wrapping.LINEAR], the result will be [Wrapping.LINEAR]
+	 */
 	override fun minus(reifiedUnit: Angle) = Angle(unit, resultWrapping(reifiedUnit), value - reifiedUnit[unit])
 	override fun unaryPlus() = this
 	override fun unaryMinus() = Angle(unit, wrapping, -value)
 	override fun times(multiplier: Double) = Angle(unit, wrapping, value * multiplier)
+	/**
+	 * if either this [wrapping] or [multiplier]'s [wrapping] is [Wrapping.LINEAR], the result will be [Wrapping.LINEAR]
+	 */
 	override fun times(multiplier: Angle) = Angle(unit, resultWrapping(multiplier), value * multiplier[unit])
 	override fun div(divisor: Double) = Angle(unit, wrapping, value / divisor)
+	/**
+	 * if either this [wrapping] or [divisor]'s [wrapping] is [Wrapping.LINEAR], the result will be [Wrapping.LINEAR]
+	 */
 	override fun div(divisor: Angle) = Angle(unit, resultWrapping(divisor), value / divisor[unit])
 	override fun abs() = Angle(unit, wrapping, abs(value))
 
 	/**
 	 * always returns a [Wrapping.LINEAR] angle
 	 *
-	 * if the target is an [Angle] and is [Wrapping.WRAPPING], then the output will be in the domain [-PI, PI] | [-180, 180]
+	 * if the target is an [Angle] and is [Wrapping.WRAPPING], then the output will be in the domain [-0.5, 0.5] rotations | [-PI, PI] radians | [-180, 180] degrees
 	 */
 	override fun findError(target: Angle): Angle {
 		return when (target.wrapping) {
