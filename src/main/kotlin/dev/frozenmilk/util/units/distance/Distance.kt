@@ -65,3 +65,28 @@ fun Supplier<out Distance>.intoMillimeters() = Supplier { get().intoMillimeters(
 fun Supplier<out Distance>.intoInches() = Supplier { get().intoInches() }
 fun Supplier<out Distance>.intoFeet() = Supplier { get().intoFeet() }
 fun Supplier<out Distance>.intoMeters() = Supplier { get().intoMeters() }
+
+// kotlin sugar
+val Double.inches
+	get() = Distance(DistanceUnits.INCH, this)
+
+val Int.inches
+	get() = this.toDouble().inches
+
+val Double.feet
+	get() = Distance(DistanceUnits.FOOT, this)
+
+val Int.feet
+	get() = this.toDouble().feet
+
+val Double.meters
+	get() = Distance(DistanceUnits.METER, this)
+
+val Int.meters
+	get() = this.toDouble().meters
+
+val Double.mm
+	get() = Distance(DistanceUnits.MILLIMETER, this)
+
+val Int.mm
+	get() = this.toDouble().mm

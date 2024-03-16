@@ -2,6 +2,9 @@ package dev.frozenmilk.util.units.angle
 
 import dev.frozenmilk.util.units.ReifiedUnit
 import dev.frozenmilk.util.units.Unit
+import dev.frozenmilk.util.units.distance.Distance
+import dev.frozenmilk.util.units.distance.DistanceUnits
+import dev.frozenmilk.util.units.distance.inches
 import java.util.function.Supplier
 import kotlin.math.abs
 import kotlin.math.sin
@@ -112,3 +115,15 @@ fun Supplier<out Angle>.intoDegrees() = Supplier { get().intoDegrees() }
 fun Supplier<out Angle>.into(wrapping: Wrapping) = Supplier { get().into(wrapping) }
 fun Supplier<out Angle>.intoWrapping() = Supplier { get().intoWrapping() }
 fun Supplier<out Angle>.intoLinear() = Supplier { get().intoLinear() }
+
+val Int.deg
+	get() = this.toDouble().deg
+
+val Double.deg
+	get() = Angle(AngleUnits.DEGREE, Wrapping.WRAPPING, this)
+
+val Int.rad
+	get() = this.toDouble().rad
+
+val Double.rad
+	get() = Angle(AngleUnits.RADIAN, Wrapping.WRAPPING, this)
