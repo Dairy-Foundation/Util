@@ -2,9 +2,6 @@ package dev.frozenmilk.util.units.angle
 
 import dev.frozenmilk.util.units.ReifiedUnit
 import dev.frozenmilk.util.units.Unit
-import dev.frozenmilk.util.units.distance.Distance
-import dev.frozenmilk.util.units.distance.DistanceUnits
-import dev.frozenmilk.util.units.distance.inches
 import java.util.function.Supplier
 import kotlin.math.abs
 import kotlin.math.sin
