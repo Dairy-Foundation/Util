@@ -89,6 +89,11 @@ class Angle @JvmOverloads constructor(unit: AngleUnit = AngleUnits.RADIAN, val w
 		val POSITIVE_INFINITY: Angle = Angle(AngleUnits.RADIAN, Wrapping.LINEAR, Double.POSITIVE_INFINITY)
 		@JvmField
 		val NaN: Angle = Angle(AngleUnits.RADIAN, Wrapping.LINEAR, Double.NaN)
+
+        fun inWrappingRange(angle: Angle) = inWrappingRange(angle.value, angle.unit)
+		fun inWrappingRange(angle: Double, unit: AngleUnit) = angle in 0.0..<unit.wrapAt
+
+		fun wrappingBehavior(angle: Double, unit: AngleUnit) = if (angle in 0.0..<unit.wrapAt) Wrapping.WRAPPING else Wrapping.LINEAR
 	}
 
 	// quick intos
@@ -113,14 +118,43 @@ fun Supplier<out Angle>.into(wrapping: Wrapping) = Supplier { get().into(wrappin
 fun Supplier<out Angle>.intoWrapping() = Supplier { get().intoWrapping() }
 fun Supplier<out Angle>.intoLinear() = Supplier { get().intoLinear() }
 
-val Int.deg
-	get() = this.toDouble().deg
+// the following will ALWAYS transpose into WRAPPING Angle's, even if they are above the threshold
+val Int.wrappedDeg
+	get() = this.toDouble().wrappedDeg
 
-val Double.deg
+val Double.wrappedDeg
 	get() = Angle(AngleUnits.DEGREE, Wrapping.WRAPPING, this)
 
-val Int.rad
-	get() = this.toDouble().rad
+val Int.wrappedRad
+	get() = this.toDouble().wrappedRad
 
-val Double.rad
+val Double.wrappedRad
 	get() = Angle(AngleUnits.RADIAN, Wrapping.WRAPPING, this)
+
+// the following will ALWAYS transpose into LINEAR Angle's
+val Int.linearDeg
+    get() = this.toDouble().linearDeg
+
+val Double.linearDeg
+    get() = Angle(AngleUnits.DEGREE, Wrapping.LINEAR, this)
+
+val Int.linearRad
+    get() = this.toDouble().linearRad
+
+val Double.linearRad
+    get() = Angle(AngleUnits.RADIAN, Wrapping.LINEAR, this)
+
+// the following will automatically determine what wrapping method is appropriate based on value
+// if the value fits in the wrapping range, it's wrapping
+// if the value does not fit in the range, it's linear
+val Int.autoDeg
+	get() = this.toDouble().autoDeg
+
+val Double.autoDeg
+	get() = Angle(AngleUnits.DEGREE, Angle.wrappingBehavior(this, AngleUnits.DEGREE), this)
+
+val Int.autoRad
+	get() = this.toDouble().autoRad
+
+val Double.autoRad
+	get() = Angle(AngleUnits.RADIAN, Angle.wrappingBehavior(this, AngleUnits.RADIAN), this)
