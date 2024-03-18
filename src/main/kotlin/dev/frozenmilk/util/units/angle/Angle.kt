@@ -118,43 +118,87 @@ fun Supplier<out Angle>.into(wrapping: Wrapping) = Supplier { get().into(wrappin
 fun Supplier<out Angle>.intoWrapping() = Supplier { get().intoWrapping() }
 fun Supplier<out Angle>.intoLinear() = Supplier { get().intoLinear() }
 
-// the following will ALWAYS transpose into WRAPPING Angle's, even if they are above the threshold
+/**
+ * Conversion of an [Int] to an [Angle] with unit [AngleUnits.DEGREE], wrapping behavior [Wrapping.WRAPPING]
+ */
 val Int.wrappedDeg
 	get() = this.toDouble().wrappedDeg
 
+/**
+ * Conversion of an [Double] to an [Angle] with unit [AngleUnits.DEGREE], wrapping behavior [Wrapping.WRAPPING]
+ */
 val Double.wrappedDeg
 	get() = Angle(AngleUnits.DEGREE, Wrapping.WRAPPING, this)
 
+/**
+ * Conversion of an [Int] to an [Angle] with unit [AngleUnits.RADIAN], wrapping behavior [Wrapping.WRAPPING]
+ */
 val Int.wrappedRad
 	get() = this.toDouble().wrappedRad
 
+/**
+ * Conversion of an [Double] to an [Angle] with unit [AngleUnits.RADIAN], wrapping behavior [Wrapping.LINEAR]
+ */
 val Double.wrappedRad
 	get() = Angle(AngleUnits.RADIAN, Wrapping.WRAPPING, this)
 
-// the following will ALWAYS transpose into LINEAR Angle's
+/**
+ * Conversion of an [Int] to an [Angle] with unit [AngleUnits.DEGREE], wrapping behavior [Wrapping.LINEAR]
+ */
 val Int.linearDeg
     get() = this.toDouble().linearDeg
 
+/**
+ * Conversion of an [Double] to an [Angle] with unit [AngleUnits.DEGREE], wrapping behavior [Wrapping.LINEAR]
+ */
 val Double.linearDeg
     get() = Angle(AngleUnits.DEGREE, Wrapping.LINEAR, this)
 
+/**
+ * Conversion of an [Int] to an [Angle] with unit [AngleUnits.RADIAN], wrapping behavior [Wrapping.LINEAR]
+ */
 val Int.linearRad
     get() = this.toDouble().linearRad
 
+/**
+ * Conversion of an [Double] to an [Angle] with unit [AngleUnits.RADIAN], wrapping behavior [Wrapping.LINEAR]
+ */
 val Double.linearRad
     get() = Angle(AngleUnits.RADIAN, Wrapping.LINEAR, this)
 
-// the following will automatically determine what wrapping method is appropriate based on value
-// if the value fits in the wrapping range, it's wrapping
-// if the value does not fit in the range, it's linear
-val Int.autoDeg
-	get() = this.toDouble().autoDeg
 
-val Double.autoDeg
+/**
+ * Conversion of an [Double] to an [Angle] with unit [AngleUnits.DEGREE].
+ * The [Wrapping] behavior will automatically determined through the following checks:
+ * 	- if the angle is less than [AngleUnits.DEGREE.wrapAt], [Wrapping.WRAPPING]
+ *  - if the angle is greater than or equal to [AngleUnits.DEGREE.wrapAt], [Wrapping.LINEAR]
+ */
+val Double.deg
 	get() = Angle(AngleUnits.DEGREE, Angle.wrappingBehavior(this, AngleUnits.DEGREE), this)
 
-val Int.autoRad
-	get() = this.toDouble().autoRad
+/**
+ * Conversion of an [Int] to an [Angle] with unit [AngleUnits.DEGREE].
+ * The [Wrapping] behavior will automatically determined through the following checks:
+ * 	- if the angle is less than [AngleUnits.DEGREE.wrapAt], [Wrapping.WRAPPING]
+ *  - if the angle is greater than or equal to [AngleUnits.DEGREE.wrapAt], [Wrapping.LINEAR]
+ */
+val Int.deg
+	get() = this.toDouble().deg
 
-val Double.autoRad
+/**
+ * Conversion of an [Double] to an [Angle] with unit [AngleUnits.RADIAN].
+ * The [Wrapping] behavior will automatically determined through the following checks:
+ * 	- if the angle is less than [AngleUnits.RADIAN.wrapAt], [Wrapping.WRAPPING]
+ *  - if the angle is greater than or equal to [AngleUnits.RADIAN.wrapAt], [Wrapping.LINEAR]
+ */
+val Double.rad
 	get() = Angle(AngleUnits.RADIAN, Angle.wrappingBehavior(this, AngleUnits.RADIAN), this)
+
+/**
+ * Conversion of an [Int] to an [Angle] with unit [AngleUnits.RADIAN].
+ * The [Wrapping] behavior will automatically determined through the following checks:
+ * 	- if the angle is less than [AngleUnits.RADIAN.wrapAt], [Wrapping.WRAPPING]
+ *  - if the angle is greater than or equal to [AngleUnits.RADIAN.wrapAt], [Wrapping.LINEAR]
+ */
+val Int.rad
+	get() = this.toDouble().rad
