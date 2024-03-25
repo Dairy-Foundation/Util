@@ -89,6 +89,11 @@ class Angle @JvmOverloads constructor(unit: AngleUnit = AngleUnits.RADIAN, val w
 		val POSITIVE_INFINITY: Angle = Angle(AngleUnits.RADIAN, Wrapping.LINEAR, Double.POSITIVE_INFINITY)
 		@JvmField
 		val NaN: Angle = Angle(AngleUnits.RADIAN, Wrapping.LINEAR, Double.NaN)
+
+        fun inWrappingRange(angle: Angle) = inWrappingRange(angle.value, angle.unit)
+		fun inWrappingRange(angle: Double, unit: AngleUnit) = angle in 0.0..<unit.wrapAt
+
+		fun wrappingBehavior(angle: Double, unit: AngleUnit) = if (angle in 0.0..<unit.wrapAt) Wrapping.WRAPPING else Wrapping.LINEAR
 	}
 
 	// quick intos
@@ -112,3 +117,88 @@ fun Supplier<out Angle>.intoDegrees() = Supplier { get().intoDegrees() }
 fun Supplier<out Angle>.into(wrapping: Wrapping) = Supplier { get().into(wrapping) }
 fun Supplier<out Angle>.intoWrapping() = Supplier { get().intoWrapping() }
 fun Supplier<out Angle>.intoLinear() = Supplier { get().intoLinear() }
+
+/**
+ * Conversion of an [Int] to an [Angle] with unit [AngleUnits.DEGREE], wrapping behavior [Wrapping.WRAPPING]
+ */
+val Int.wrappedDeg
+	get() = this.toDouble().wrappedDeg
+
+/**
+ * Conversion of an [Double] to an [Angle] with unit [AngleUnits.DEGREE], wrapping behavior [Wrapping.WRAPPING]
+ */
+val Double.wrappedDeg
+	get() = Angle(AngleUnits.DEGREE, Wrapping.WRAPPING, this)
+
+/**
+ * Conversion of an [Int] to an [Angle] with unit [AngleUnits.RADIAN], wrapping behavior [Wrapping.WRAPPING]
+ */
+val Int.wrappedRad
+	get() = this.toDouble().wrappedRad
+
+/**
+ * Conversion of an [Double] to an [Angle] with unit [AngleUnits.RADIAN], wrapping behavior [Wrapping.LINEAR]
+ */
+val Double.wrappedRad
+	get() = Angle(AngleUnits.RADIAN, Wrapping.WRAPPING, this)
+
+/**
+ * Conversion of an [Int] to an [Angle] with unit [AngleUnits.DEGREE], wrapping behavior [Wrapping.LINEAR]
+ */
+val Int.linearDeg
+    get() = this.toDouble().linearDeg
+
+/**
+ * Conversion of an [Double] to an [Angle] with unit [AngleUnits.DEGREE], wrapping behavior [Wrapping.LINEAR]
+ */
+val Double.linearDeg
+    get() = Angle(AngleUnits.DEGREE, Wrapping.LINEAR, this)
+
+/**
+ * Conversion of an [Int] to an [Angle] with unit [AngleUnits.RADIAN], wrapping behavior [Wrapping.LINEAR]
+ */
+val Int.linearRad
+    get() = this.toDouble().linearRad
+
+/**
+ * Conversion of an [Double] to an [Angle] with unit [AngleUnits.RADIAN], wrapping behavior [Wrapping.LINEAR]
+ */
+val Double.linearRad
+    get() = Angle(AngleUnits.RADIAN, Wrapping.LINEAR, this)
+
+
+/**
+ * Conversion of an [Double] to an [Angle] with unit [AngleUnits.DEGREE].
+ * The [Wrapping] behavior will automatically determined through the following checks:
+ * 	- if the angle is less than [AngleUnits.DEGREE.wrapAt], [Wrapping.WRAPPING]
+ *  - if the angle is greater than or equal to [AngleUnits.DEGREE.wrapAt], [Wrapping.LINEAR]
+ */
+val Double.deg
+	get() = Angle(AngleUnits.DEGREE, Angle.wrappingBehavior(this, AngleUnits.DEGREE), this)
+
+/**
+ * Conversion of an [Int] to an [Angle] with unit [AngleUnits.DEGREE].
+ * The [Wrapping] behavior will automatically determined through the following checks:
+ * 	- if the angle is less than [AngleUnits.DEGREE.wrapAt], [Wrapping.WRAPPING]
+ *  - if the angle is greater than or equal to [AngleUnits.DEGREE.wrapAt], [Wrapping.LINEAR]
+ */
+val Int.deg
+	get() = this.toDouble().deg
+
+/**
+ * Conversion of an [Double] to an [Angle] with unit [AngleUnits.RADIAN].
+ * The [Wrapping] behavior will automatically determined through the following checks:
+ * 	- if the angle is less than [AngleUnits.RADIAN.wrapAt], [Wrapping.WRAPPING]
+ *  - if the angle is greater than or equal to [AngleUnits.RADIAN.wrapAt], [Wrapping.LINEAR]
+ */
+val Double.rad
+	get() = Angle(AngleUnits.RADIAN, Angle.wrappingBehavior(this, AngleUnits.RADIAN), this)
+
+/**
+ * Conversion of an [Int] to an [Angle] with unit [AngleUnits.RADIAN].
+ * The [Wrapping] behavior will automatically determined through the following checks:
+ * 	- if the angle is less than [AngleUnits.RADIAN.wrapAt], [Wrapping.WRAPPING]
+ *  - if the angle is greater than or equal to [AngleUnits.RADIAN.wrapAt], [Wrapping.LINEAR]
+ */
+val Int.rad
+	get() = this.toDouble().rad
