@@ -3,6 +3,7 @@ package dev.frozenmilk.util.units.position
 import dev.frozenmilk.util.units.distance.DistanceUnit
 import dev.frozenmilk.util.units.distance.DistanceUnits
 import dev.frozenmilk.util.units.angle.Angle
+import dev.frozenmilk.util.units.angle.AngleUnit
 import dev.frozenmilk.util.units.angle.AngleUnits
 import dev.frozenmilk.util.units.angle.Wrapping
 import java.util.Objects
@@ -11,7 +12,19 @@ class Pose2D @JvmOverloads constructor(val vector2D: Vector2D = Vector2D(), val 
 	/**
 	 * non-mutating
 	 */
-	infix fun into(units: DistanceUnit) = Pose2D(vector2D into units, heading)
+	fun into(xUnit: DistanceUnit, yUnit: DistanceUnit, headingUnit: AngleUnit, headingWrapping: Wrapping) = Pose2D(vector2D.into(xUnit, yUnit), heading.into(headingUnit).into(headingWrapping))
+	/**
+	 * non-mutating
+	 */
+	fun into(xUnit: DistanceUnit, yUnit: DistanceUnit = xUnit) = Pose2D(vector2D.into(xUnit, yUnit), heading)
+	/**
+	 * non-mutating
+	 */
+	fun into(headingUnit: AngleUnit, headingWrapping: Wrapping = heading.wrapping) = Pose2D(vector2D, heading.into(headingUnit).into(headingWrapping))
+	/**
+	 * non-mutating
+	 */
+	fun into(headingWrapping: Wrapping) = Pose2D(vector2D, heading.into(headingWrapping))
 
 	/**
 	 * non-mutating
@@ -57,6 +70,18 @@ class Pose2D @JvmOverloads constructor(val vector2D: Vector2D = Vector2D(), val 
 	override fun equals(other: Any?) = other is Pose2D && vector2D == other.vector2D && heading == other.heading
 
 	override fun hashCode() = Objects.hash(vector2D, heading)
+
+	// quick intos (vector)
+	fun intoMillimeters() = into(DistanceUnits.MILLIMETER)
+	fun intoInches() = into(DistanceUnits.INCH)
+	fun intoFeet() = into(DistanceUnits.FOOT)
+	fun intoMeters() = into(DistanceUnits.METER)
+	// quick intos (heading)
+	fun intoDegrees() = into(AngleUnits.DEGREE)
+	fun intoRadians() = into(AngleUnits.RADIAN)
+	fun intoWrapping() = into(Wrapping.WRAPPING)
+	fun intoLinear() = into(Wrapping.LINEAR)
+
 }
 
 fun millimeterPose(x: Double = 0.0, y: Double = 0.0, heading: Angle = Angle(AngleUnits.RADIAN, Wrapping.WRAPPING)) = Pose2D(millimeterVector(x, y), heading)

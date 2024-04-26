@@ -32,12 +32,7 @@ class Vector2D @JvmOverloads constructor(val x: Distance = Distance(DistanceUnit
 	/**
 	 * non-mutating
 	 */
-	fun into(xUnit: DistanceUnit, yUnit: DistanceUnit) = Vector2D(this.x.into(xUnit), this.y.into(yUnit))
-
-	/**
-	 * non-mutating
-	 */
-	infix fun into(unit: DistanceUnit) = into(unit, unit)
+	fun into(xUnit: DistanceUnit, yUnit: DistanceUnit = xUnit) = Vector2D(this.x.into(xUnit), this.y.into(yUnit))
 
 	/**
 	 * non-mutating
@@ -73,6 +68,11 @@ class Vector2D @JvmOverloads constructor(val x: Distance = Distance(DistanceUnit
 	/**
 	 * non-mutating
 	 */
+	operator fun div(scalar: Double) = Vector2D(x / scalar, y / scalar)
+
+	/**
+	 * non-mutating
+	 */
 	infix fun rotate(angle: Angle): Vector2D {
 		@Suppress("NAME_SHADOWING")
 		val angle = angle.into(AngleUnits.RADIAN)
@@ -98,6 +98,12 @@ class Vector2D @JvmOverloads constructor(val x: Distance = Distance(DistanceUnit
 	override fun toString(): String = "($x, $y)"
 	override fun equals(other: Any?): Boolean = other is Vector2D && this.x == other.x && this.y == other.y
 	override fun hashCode(): Int = Objects.hash(x, y)
+
+	// quick intos
+	fun intoMillimeters() = into(DistanceUnits.MILLIMETER)
+	fun intoInches() = into(DistanceUnits.INCH)
+	fun intoFeet() = into(DistanceUnits.FOOT)
+	fun intoMeters() = into(DistanceUnits.METER)
 }
 
 fun millimeterVector(x: Double = 0.0, y: Double = 0.0) = Vector2D(DistanceUnits.MILLIMETER, x, y)
