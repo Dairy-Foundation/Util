@@ -34,7 +34,7 @@ abstract class CellBase<T> : Cell<T> {
 	val timeSinceLastAccess: Double
 		get() = max(timeSincelastGet, timeSincelastSet)
 
-	override fun toString(): String = get().toString()
+	override fun toString(): String = "${javaClass.simpleName}|${get().toString()}|"
 }
 
 internal class InnerCell<T>(private var ref: T) : Cell<T> {

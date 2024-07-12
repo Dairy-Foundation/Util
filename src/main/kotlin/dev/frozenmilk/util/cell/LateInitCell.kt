@@ -35,5 +35,5 @@ open class LateInitCell<T> (protected var internalCell: Cell<T?>, protected val 
 	 */
 	fun <R> safeInvoke(fn: (T) -> R): R? = internalCell.get()?.let(fn)
 
-	override fun toString(): String = internalCell.get().toString()
+	override fun toString(): String = "${javaClass.simpleName}|${internalCell.get().toString()}|"
 }
