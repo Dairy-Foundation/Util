@@ -1,13 +1,12 @@
 package dev.frozenmilk.util.cell
 
+import java.util.function.BiFunction
 import java.util.function.Supplier
 
-open class InvalidatingCell<T>(supplier: Supplier<T>, var invalidator: Supplier<Boolean>) : LazyCell<T>(supplier) {
+open class InvalidatingCell<T>(supplier: Supplier<T>, var invalidator: BiFunction<InvalidatingCell<T>, T, Boolean>) : LazyCell<T>(supplier) {
 	override fun get(): T {
-		if (invalidator.get()) invalidate()
+		val ref = safeGet()
+		if (ref != null && invalidator.apply(this, ref)) invalidate()
 		return super.get()
 	}
 }
-
-@JvmName("CellUtils")
-fun <T> Supplier<T>.intoInvalidatingCell(invalidator: Supplier<Boolean>) = InvalidatingCell(this, invalidator)
