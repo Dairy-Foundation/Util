@@ -75,10 +75,8 @@ class Vector2D @JvmOverloads constructor(val x: Distance = Distance(DistanceUnit
 	 */
 	infix fun rotate(angle: Angle): Vector2D {
 		@Suppress("NAME_SHADOWING")
-		val angle = angle.into(AngleUnits.RADIAN)
-		val cos = cos(angle.value)
-		val sin = sin(angle.value)
-		return Vector2D(x * cos - y * sin, x * sin + y * cos)
+		val angle = angle.intoRadians()
+		return Vector2D(x * angle.cos - y * angle.sin, x * angle.sin + y * angle.cos)
 	}
 
 	/**
