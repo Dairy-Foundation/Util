@@ -26,14 +26,14 @@ open class LateInitCell<T> (protected var internalCell: Cell<T?>, protected val 
 	 */
 	fun invalidate() = internalCell.accept(null)
 
-	fun initialised(): Boolean = safeGet() != null
+	fun initialised(): Boolean = internalCell.get() != null
 
 	/**
 	 * applies the function and returns the result if the internals are already initialised, else return null
 	 *
 	 * DOES NOT evaluate the contents of the cell, if they are in an [invalidate]d state
 	 */
-	fun <R> safeInvoke(fn: (T) -> R): R? = safeGet()?.let(fn)
+	fun <R> safeInvoke(fn: (T) -> R): R? = internalCell.get()?.let(fn)
 
-	override fun toString(): String = safeGet().toString()
+	override fun toString(): String = internalCell.get().toString()
 }
