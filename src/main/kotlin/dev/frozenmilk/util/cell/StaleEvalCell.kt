@@ -8,6 +8,3 @@ import java.util.function.Supplier
 class StaleEvalCell<T>(var timeOut: Double, supplier: Supplier<T>) : InvalidatingCell<T>(supplier, { self, _ ->
 	self.timeSinceAfterLastEval > timeOut
 })
-
-@JvmName("CellUtils")
-fun <T> Supplier<T>.intoStaleEvalCell(timeOut: Double) = StaleEvalCell(timeOut, this)

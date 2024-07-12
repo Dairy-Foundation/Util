@@ -46,7 +46,8 @@ open class SupplierMirroredCell<T>(
     }
 }
 
-fun recurseFindField(clazz: Class<*>?, field: String): Field {
+@Throws(IllegalStateException::class)
+private fun recurseFindField(clazz: Class<*>?, field: String): Field {
     if (clazz == null) throw IllegalStateException("unable to find field after searching all classes and super classes")
     return try {
         clazz.getDeclaredField(field)

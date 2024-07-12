@@ -37,6 +37,3 @@ open class LateInitCell<T> (protected var internalCell: Cell<T?>, protected val 
 
 	override fun toString(): String = safeGet().toString()
 }
-
-@JvmName("CellUtils")
-fun <T> T.intoLateInitCell() = LateInitCell(this)

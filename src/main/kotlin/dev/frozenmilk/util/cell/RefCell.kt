@@ -11,6 +11,3 @@ open class RefCell<T> (protected var internalCell: Cell<T>) : CellBase<T>() {
 		internalCell.accept(p0)
 	}
 }
-
-@JvmName("CellUtils")
-fun <T> T.intoCell() = RefCell(this)

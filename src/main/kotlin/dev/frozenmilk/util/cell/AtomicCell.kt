@@ -30,6 +30,3 @@ class AtomicCell<T>(ref: T) : Cell<T>, AtomicReference<T>(ref) {
 
 	override fun toString(): String = get().toString()
 }
-
-@JvmName("CellUtils")
-fun <T> T?.intoAtomicCell() = AtomicCell(this)

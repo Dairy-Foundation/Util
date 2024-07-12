@@ -35,6 +35,3 @@ open class LazyCell<T> (private val supplier: Supplier<T>) : LateInitCell<T>(err
 		return super.get()
 	}
 }
-
-@JvmName("CellUtils")
-fun <T> Supplier<T>.intoLazyCell() = LazyCell(this)
