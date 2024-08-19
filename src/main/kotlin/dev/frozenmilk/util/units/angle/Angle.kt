@@ -1,9 +1,10 @@
+@file:JvmName("Angles")
 package dev.frozenmilk.util.units.angle
 
 import dev.frozenmilk.util.units.ReifiedUnit
 import dev.frozenmilk.util.units.Unit
 import java.util.function.Supplier
-import kotlin.math.abs
+import kotlin.math.absoluteValue
 import kotlin.math.sin
 import kotlin.math.cos
 import kotlin.math.tan
@@ -26,6 +27,7 @@ enum class AngleUnits(override val toCommonRatio: Double, override val wrapAt: D
 
 enum class Wrapping {
 	WRAPPING,
+	// TODO add POV
 	LINEAR
 }
 
@@ -52,7 +54,8 @@ class Angle @JvmOverloads constructor(unit: AngleUnit = AngleUnits.RADIAN, val w
 	 * if either this [wrapping] or [divisor]'s [wrapping] is [Wrapping.LINEAR], the result will be [Wrapping.LINEAR]
 	 */
 	override fun div(divisor: Angle) = Angle(unit, resultWrapping(divisor), value / divisor[unit])
-	override fun abs() = Angle(unit, wrapping, abs(value))
+	override val absoluteValue: Angle
+		get() = if (value.absoluteValue == value) this else Angle(unit, wrapping, value.absoluteValue)
 
 	/**
 	 * always returns a [Wrapping.LINEAR] angle
@@ -78,9 +81,9 @@ class Angle @JvmOverloads constructor(unit: AngleUnit = AngleUnits.RADIAN, val w
 	override fun pow(n: Int) = Angle(unit, wrapping, value.pow(n))
 	override fun sqrt() = Angle(unit, wrapping, sqrt(value))
 	override fun toString() = "$value $unit"
-	override fun equals(other: Any?) = other is Angle && abs((this - other).value) < 1e-12
+	override fun equals(other: Any?) = other is Angle && (this - other).value.absoluteValue < 1e-12
 	override fun hashCode(): Int = into(AngleUnits.RADIAN).value.hashCode()
-	override fun compareTo(other: Angle) = intoRadians().value.compareTo(other[unit])
+	override fun compareTo(other: Angle) = value.compareTo(other[unit])
 
 	companion object {
 		@JvmField
@@ -121,48 +124,56 @@ fun Supplier<out Angle>.intoLinear() = Supplier { get().intoLinear() }
 /**
  * Conversion of an [Int] to an [Angle] with unit [AngleUnits.DEGREE], wrapping behavior [Wrapping.WRAPPING]
  */
+@get:JvmName("wrappedDeg")
 val Int.wrappedDeg
 	get() = this.toDouble().wrappedDeg
 
 /**
  * Conversion of an [Double] to an [Angle] with unit [AngleUnits.DEGREE], wrapping behavior [Wrapping.WRAPPING]
  */
+@get:JvmName("wrappedDeg")
 val Double.wrappedDeg
 	get() = Angle(AngleUnits.DEGREE, Wrapping.WRAPPING, this)
 
 /**
  * Conversion of an [Int] to an [Angle] with unit [AngleUnits.RADIAN], wrapping behavior [Wrapping.WRAPPING]
  */
+@get:JvmName("wrappedRad")
 val Int.wrappedRad
 	get() = this.toDouble().wrappedRad
 
 /**
  * Conversion of an [Double] to an [Angle] with unit [AngleUnits.RADIAN], wrapping behavior [Wrapping.LINEAR]
  */
+@get:JvmName("wrappedRad")
 val Double.wrappedRad
 	get() = Angle(AngleUnits.RADIAN, Wrapping.WRAPPING, this)
 
 /**
  * Conversion of an [Int] to an [Angle] with unit [AngleUnits.DEGREE], wrapping behavior [Wrapping.LINEAR]
  */
+@get:JvmName("linearDeg")
 val Int.linearDeg
     get() = this.toDouble().linearDeg
 
 /**
  * Conversion of an [Double] to an [Angle] with unit [AngleUnits.DEGREE], wrapping behavior [Wrapping.LINEAR]
  */
+@get:JvmName("linearDeg")
 val Double.linearDeg
     get() = Angle(AngleUnits.DEGREE, Wrapping.LINEAR, this)
 
 /**
  * Conversion of an [Int] to an [Angle] with unit [AngleUnits.RADIAN], wrapping behavior [Wrapping.LINEAR]
  */
+@get:JvmName("linearRad")
 val Int.linearRad
     get() = this.toDouble().linearRad
 
 /**
  * Conversion of an [Double] to an [Angle] with unit [AngleUnits.RADIAN], wrapping behavior [Wrapping.LINEAR]
  */
+@get:JvmName("linearRad")
 val Double.linearRad
     get() = Angle(AngleUnits.RADIAN, Wrapping.LINEAR, this)
 
@@ -173,6 +184,7 @@ val Double.linearRad
  * 	- if the angle is less than [AngleUnits.DEGREE.wrapAt], [Wrapping.WRAPPING]
  *  - if the angle is greater than or equal to [AngleUnits.DEGREE.wrapAt], [Wrapping.LINEAR]
  */
+@get:JvmName("deg")
 val Double.deg
 	get() = Angle(AngleUnits.DEGREE, Angle.wrappingBehavior(this, AngleUnits.DEGREE), this)
 
@@ -182,6 +194,7 @@ val Double.deg
  * 	- if the angle is less than [AngleUnits.DEGREE.wrapAt], [Wrapping.WRAPPING]
  *  - if the angle is greater than or equal to [AngleUnits.DEGREE.wrapAt], [Wrapping.LINEAR]
  */
+@get:JvmName("deg")
 val Int.deg
 	get() = this.toDouble().deg
 
@@ -191,6 +204,7 @@ val Int.deg
  * 	- if the angle is less than [AngleUnits.RADIAN.wrapAt], [Wrapping.WRAPPING]
  *  - if the angle is greater than or equal to [AngleUnits.RADIAN.wrapAt], [Wrapping.LINEAR]
  */
+@get:JvmName("rad")
 val Double.rad
 	get() = Angle(AngleUnits.RADIAN, Angle.wrappingBehavior(this, AngleUnits.RADIAN), this)
 
@@ -200,5 +214,6 @@ val Double.rad
  * 	- if the angle is less than [AngleUnits.RADIAN.wrapAt], [Wrapping.WRAPPING]
  *  - if the angle is greater than or equal to [AngleUnits.RADIAN.wrapAt], [Wrapping.LINEAR]
  */
+@get:JvmName("rad")
 val Int.rad
 	get() = this.toDouble().rad

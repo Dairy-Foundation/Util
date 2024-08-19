@@ -13,6 +13,8 @@ import kotlin.math.hypot
 import kotlin.math.sin
 
 class Vector2D @JvmOverloads constructor(val x: Distance = Distance(DistanceUnits.MILLIMETER, 0.0), val y: Distance = Distance(DistanceUnits.MILLIMETER, 0.0)) {
+	operator fun component1() = x
+	operator fun component2() = y
 	/**
 	 * angle of the vector, always a [Angle] of type [AngleUnits.RADIAN] under the hood
 	 */

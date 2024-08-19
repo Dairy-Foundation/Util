@@ -28,7 +28,7 @@ abstract class ReifiedUnit<U: Unit<U>, RU: ReifiedUnit<U, RU>>(val unit: U, val 
 	/**
 	 * non-mutating
 	 */
-	operator fun get(unit: U): Double = into(unit).value
+	operator fun get(unit: U): Double = this.unit.into(unit, value)
 	/**
 	 * non-mutating
 	 */
@@ -76,7 +76,7 @@ abstract class ReifiedUnit<U: Unit<U>, RU: ReifiedUnit<U, RU>>(val unit: U, val 
 	/**
 	 * non-mutating
 	 */
-	abstract fun abs(): RU
+	abstract val absoluteValue: RU
 	/**
 	 * returns the error difference this and [target], for some units, this may be the same as target - this
 	 */

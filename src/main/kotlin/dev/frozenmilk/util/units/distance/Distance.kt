@@ -1,9 +1,11 @@
+@file:JvmName("Distances")
 package dev.frozenmilk.util.units.distance
 
 import dev.frozenmilk.util.units.ReifiedUnit
 import dev.frozenmilk.util.units.Unit
 import java.util.function.Supplier
 import kotlin.math.abs
+import kotlin.math.absoluteValue
 import kotlin.math.pow
 import kotlin.math.sqrt
 
@@ -15,6 +17,7 @@ interface DistanceUnit : Unit<DistanceUnit> {
 }
 enum class DistanceUnits(override val toCommonRatio: Double) : DistanceUnit {
 	METER(1000.0),
+	CENTIMETER(100.0),
 	MILLIMETER(1.0),
 	INCH(25.4),
 	FOOT(304.8),
@@ -33,14 +36,15 @@ class Distance (unit: DistanceUnit = DistanceUnits.MILLIMETER, value: Double = 0
 	override fun pow(n: Double) = Distance(unit, value.pow(n))
 	override fun pow(n: Int) = Distance(unit, value.pow(n))
 	override fun sqrt() = Distance(unit, sqrt(value))
-	override fun abs() = Distance(unit, abs(value))
+	override val absoluteValue: Distance
+		get() = if (value.absoluteValue == value) this else Distance(unit, value.absoluteValue)
 	override fun findError(target: Distance) = Distance(unit, target[unit] - value)
 	override fun coerceAtLeast(minimumValue: Distance) = Distance(unit, value.coerceAtLeast(minimumValue[unit]))
 	override fun coerceAtMost(maximumValue: Distance) = Distance(unit, value.coerceAtMost(maximumValue[unit]))
 	override fun coerceIn(minimumValue: Distance, maximumValue: Distance) = Distance(unit, value.coerceIn(minimumValue[unit], maximumValue[unit]))
 	override fun compareTo(other: Distance): Int = value.compareTo(other[unit])
 	override fun toString() = "$value $unit"
-	override fun equals(other: Any?): Boolean = other is Distance && abs((this - other).value) < 1e-12
+	override fun equals(other: Any?): Boolean = other is Distance && (this - other).value.absoluteValue < 1e-12
 	override fun hashCode(): Int = intoMillimeters().value.hashCode()
 
 	companion object {
@@ -67,26 +71,42 @@ fun Supplier<out Distance>.intoFeet() = Supplier { get().intoFeet() }
 fun Supplier<out Distance>.intoMeters() = Supplier { get().intoMeters() }
 
 // kotlin sugar
-val Double.inches
+@get:JvmName("inch")
+val Double.inch
 	get() = Distance(DistanceUnits.INCH, this)
 
-val Int.inches
-	get() = this.toDouble().inches
+@get:JvmName("inch")
+val Int.inch
+	get() = this.toDouble().inch
 
-val Double.feet
+@get:JvmName("ft")
+val Double.ft
 	get() = Distance(DistanceUnits.FOOT, this)
 
-val Int.feet
-	get() = this.toDouble().feet
+@get:JvmName("ft")
+val Int.ft
+	get() = this.toDouble().ft
 
-val Double.meters
+@get:JvmName("m")
+val Double.m
 	get() = Distance(DistanceUnits.METER, this)
 
-val Int.meters
-	get() = this.toDouble().meters
+@get:JvmName("m")
+val Int.m
+	get() = this.toDouble().m
 
+@get:JvmName("mm")
 val Double.mm
 	get() = Distance(DistanceUnits.MILLIMETER, this)
 
+@get:JvmName("mm")
 val Int.mm
 	get() = this.toDouble().mm
+
+@get:JvmName("cm")
+val Double.cm
+	get() = Distance(DistanceUnits.CENTIMETER, this)
+
+@get:JvmName("cm")
+val Int.cm
+	get() = this.toDouble().cm
