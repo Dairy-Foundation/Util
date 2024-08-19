@@ -1,11 +1,14 @@
 package dev.frozenmilk.util.cell
 
-open class LateInitCell<T> (protected var internalCell: Cell<T?>, protected val error: String = "Attempted to obtain a null value from an unsafe Cell") : CellBase<T>() {
-	@JvmOverloads
-	constructor(ref: T? = null, error: String = "Attempted to obtain a null value from an unsafe Cell") : this(InnerCell(ref), error)
+import dev.frozenmilk.util.observe.Observer
+import dev.frozenmilk.util.observe.Observerable
+import java.lang.ref.WeakReference
+import java.util.function.Function
+
+open class LateInitCell<T> @JvmOverloads constructor(protected open var ref: T? = null, protected val error: String = "Attempted to obtain a null value from an unsafe Cell") : CellBase<T>(), Observerable<T?> {
 	override fun get(): T {
 		lastGet = System.nanoTime()
-		return internalCell.get() ?: throw IllegalStateException(error)
+		return ref ?: throw IllegalStateException(error)
 	}
 
 	/**
@@ -13,27 +16,52 @@ open class LateInitCell<T> (protected var internalCell: Cell<T?>, protected val 
 	 */
 	fun safeGet(): T? {
 		lastGet = System.nanoTime()
-		return internalCell.get()
+		return ref
 	}
 
-	override fun accept(p0: T) {
+	final override fun accept(p0: T) {
 		lastSet = System.nanoTime()
-		internalCell.accept(p0)
+		ref = p0
+		observers.forEach {
+			it.get()?.update(ref)
+		}
 	}
 
 	/**
 	 * causes the next attempt to get the contents of the cell to fail
 	 */
-	fun invalidate() = internalCell.accept(null)
+	fun invalidate() {
+		lastSet = System.nanoTime()
+		ref = null
+		observers.forEach {
+			it.get()?.update(null)
+		}
+	}
 
-	fun initialised(): Boolean = internalCell.get() != null
+	fun initialised() = ref != null
 
 	/**
 	 * applies the function and returns the result if the internals are already initialised, else return null
 	 *
 	 * DOES NOT evaluate the contents of the cell, if they are in an [invalidate]d state
 	 */
-	fun <R> safeInvoke(fn: (T) -> R): R? = internalCell.get()?.let(fn)
+	fun <R> safeInvoke(fn: Function<T, R>): R? = ref?.let(fn::apply)
 
-	override fun toString(): String = "${javaClass.simpleName}|${internalCell.get().toString()}|"
+	private val observers = mutableSetOf<WeakReference<Observer<in T?>>>()
+
+	final override fun bind(observer: Observer<in T?>) {
+		if (observer == this) throw IllegalArgumentException("Self binding is illegal")
+		observers.removeIf { it.get() == null }
+		observers.add(WeakReference(observer))
+		observer.update(ref)
+	}
+
+	final override fun update(new: T?) {
+		if (new != ref) { // ensures no cyclic operations
+			if (new == null) invalidate()
+			else accept(new)
+		}
+	}
+
+	final override fun toString() = "${javaClass.simpleName}|$ref|"
 }

@@ -15,6 +15,11 @@ private class InternalWeakCell<T>(ref: T) : Cell<T?> {
 /**
  * a cell that contains a weak reference, which gets automatically dropped by the garbage collector
  */
-class WeakCell<T> private constructor(internalWeakCell: InternalWeakCell<T>) : LateInitCell<T>(internalWeakCell, "attempted to access the dropped contents of a WeakCell") {
-	constructor(ref: T) : this(InternalWeakCell(ref))
+class WeakCell<T>(ref: T) : LateInitCell<T>(null, "attempted to access the dropped contents of a WeakCell") {
+	override var ref: T?
+		get() = weakRef.get()
+		set(value) {
+			weakRef = WeakReference(value)
+		}
+	private var weakRef = WeakReference(ref)
 }

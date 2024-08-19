@@ -26,12 +26,25 @@ open class LazyCell<T> (private val supplier: Supplier<T>) : LateInitCell<T>(err
 	private var timeBeforeLastEval = 0L
 	private var timeAfterLastEval = 0L
 
+	/**
+	 * evaluates the contents of this cell from [supplier]
+	 */
+	fun evaluate() {
+		timeBeforeLastEval = System.nanoTime()
+		accept(supplier.get())
+		timeAfterLastEval = System.nanoTime()
+	}
+
+	/**
+	 * [evaluate] but doesn't run if the cell has contents
+	 */
+	fun safeEvaluate() {
+		if (initialised()) return
+		evaluate()
+	}
+
 	override fun get(): T {
-		if(!initialised()) {
-			timeBeforeLastEval = System.nanoTime()
-			accept(supplier.get())
-			timeAfterLastEval = System.nanoTime()
-		}
+		safeEvaluate()
 		return super.get()
 	}
 }

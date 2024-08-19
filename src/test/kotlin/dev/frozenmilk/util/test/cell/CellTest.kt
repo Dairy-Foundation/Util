@@ -1,3 +1,5 @@
+package dev.frozenmilk.util.test.cell
+
 import dev.frozenmilk.util.cell.RefCell
 import org.junit.Assert
 import org.junit.Before

@@ -1,3 +1,5 @@
+package dev.frozenmilk.util.test.cell
+
 import dev.frozenmilk.util.cell.LateInitCell
 import org.junit.Assert
 import org.junit.Before
@@ -24,9 +26,9 @@ class LateInitCellTest {
 
 	@Test
 	fun string() {
-		Assert.assertEquals("null", cell.toString())
+		Assert.assertEquals("LateInitCell|null|", cell.toString())
 		cell.accept("content")
-		Assert.assertEquals("content", cell.toString())
+		Assert.assertEquals("LateInitCell|content|", cell.toString())
 	}
 
 	@Test
