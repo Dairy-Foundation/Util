@@ -1,57 +1,39 @@
 package dev.frozenmilk.util.units.position
 
 import dev.frozenmilk.util.units.angle.Angle
-import dev.frozenmilk.util.units.angle.AngleUnits
-import dev.frozenmilk.util.units.angle.Wrapping
-import dev.frozenmilk.util.units.distance.Distance
-import dev.frozenmilk.util.units.distance.DistanceUnit
-import dev.frozenmilk.util.units.distance.DistanceUnits
-import java.util.Objects
-import kotlin.math.atan2
-import kotlin.math.cos
-import kotlin.math.hypot
-import kotlin.math.sin
 
-class Vector2D @JvmOverloads constructor(val x: Distance = Distance(DistanceUnits.MILLIMETER, 0.0), val y: Distance = Distance(DistanceUnits.MILLIMETER, 0.0)) {
-	operator fun component1() = x
-	operator fun component2() = y
-	/**
-	 * angle of the vector, always a [Angle] of type [AngleUnits.RADIAN] under the hood
-	 */
-	val theta: Angle by lazy { Angle(AngleUnits.RADIAN, Wrapping.WRAPPING, atan2(y.intoMillimeters().value, x.intoMillimeters().value)) }
+abstract class Vector2D<T, SELF: Vector2D<T, SELF>> {
+	abstract val x: T
+	abstract val y: T
 
 	/**
-	 * length of the vector, always a [Distance] of type [DistanceUnits.MILLIMETER] under the hood
+	 * angle of the vector, always a [Angle] of type [dev.frozenmilk.util.units.angle.AngleUnits.RADIAN] under the hood
 	 */
-	val magnitude: Distance by lazy { Distance(DistanceUnits.MILLIMETER, hypot(x.intoMillimeters().value, y.intoMillimeters().value)) }
-	constructor(distanceUnit: DistanceUnit = DistanceUnits.MILLIMETER, x: Double = 0.0, y: Double = 0.0) : this(Distance(distanceUnit, x), Distance(distanceUnit, y))
+	abstract val theta: Angle
 
 	/**
-	 * polar constructor
+	 * length of the vector
 	 */
-	constructor(magnitude: Distance, t: Angle) : this(magnitude.unit, magnitude.value * cos(t.intoRadians().value), magnitude.value * sin(t.intoRadians().value))
+	abstract val magnitude: T
+	operator fun component1(): T = x
+	operator fun component2(): T = y
 
 	/**
 	 * non-mutating
 	 */
-	fun into(xUnit: DistanceUnit, yUnit: DistanceUnit = xUnit) = Vector2D(this.x.into(xUnit), this.y.into(yUnit))
+	abstract operator fun plus(vector2D: SELF): SELF
 
 	/**
 	 * non-mutating
 	 */
-	operator fun plus(vector2D: Vector2D) = Vector2D(x + vector2D.x, y + vector2D.y)
-
-	/**
-	 * non-mutating
-	 */
-	operator fun minus(vector2D: Vector2D) = Vector2D(x - vector2D.x, y - vector2D.y)
+	abstract operator fun minus(vector2D: SELF): SELF
 
 	/**
 	 * non-mutating
 	 *
 	 * has no effect
 	 */
-	operator fun unaryPlus(): Vector2D = this
+	abstract operator fun unaryPlus(): SELF
 
 	/**
 	 * non-mutating
@@ -60,53 +42,50 @@ class Vector2D @JvmOverloads constructor(val x: Distance = Distance(DistanceUnit
 	 *
 	 * also equivalent to [times] -1.0
 	 */
-	operator fun unaryMinus() = this * -1.0
+	abstract operator fun unaryMinus(): SELF
 
 	/**
 	 * non-mutating
 	 */
-	operator fun times(scalar: Double) = Vector2D(x * scalar, y * scalar)
+	abstract operator fun times(scalar: T): SELF
 
 	/**
 	 * non-mutating
 	 */
-	operator fun div(scalar: Double) = Vector2D(x / scalar, y / scalar)
+	abstract operator fun div(scalar: T): SELF
 
 	/**
 	 * non-mutating
 	 */
-	infix fun rotate(angle: Angle): Vector2D {
-		@Suppress("NAME_SHADOWING")
-		val angle = angle.intoRadians()
-		return Vector2D(x * angle.cos - y * angle.sin, x * angle.sin + y * angle.cos)
-	}
+	abstract operator fun times(scalar: Double): SELF
 
 	/**
 	 * non-mutating
 	 */
-	fun normalise(length: Distance = Distance(DistanceUnits.MILLIMETER, 1.0)) = Vector2D(length, theta)
+	abstract operator fun div(scalar: Double): SELF
 
 	/**
 	 * non-mutating
-	 *
-	 * The resulting [dev.frozenmilk.util.units.distance.SquareDistance] can be transformed using [dev.frozenmilk.util.units.distance.SquareDistance.into] in order to have the results behave as though all the inputs were of that unit type
-	 *
-	 * the scalar result can then be retrieved using [dev.frozenmilk.util.units.distance.SquareDistance.value]
 	 */
-	infix fun dot(vector2D: Vector2D) = x * vector2D.x + y * vector2D.y
+	abstract infix fun rotate(angle: Angle): SELF
 
-	override fun toString(): String = "($x, $y)"
-	override fun equals(other: Any?): Boolean = other is Vector2D && this.x == other.x && this.y == other.y
-	override fun hashCode(): Int = Objects.hash(x, y)
+	/**
+	 * non-mutating
+	 */
+	abstract fun normalise(length: T): SELF
+	/**
+	 * non-mutating
+	 */
+	abstract fun normalise(): SELF
 
-	// quick intos
-	fun intoMillimeters() = into(DistanceUnits.MILLIMETER)
-	fun intoInches() = into(DistanceUnits.INCH)
-	fun intoFeet() = into(DistanceUnits.FOOT)
-	fun intoMeters() = into(DistanceUnits.METER)
+	/**
+	 * non-mutating
+	 */
+	abstract infix fun dot(vector2D: SELF): T
+
+	abstract override fun toString(): String
+
+	abstract override fun equals(other: Any?): Boolean
+
+	abstract override fun hashCode(): Int
 }
-
-fun millimeterVector(x: Double = 0.0, y: Double = 0.0) = Vector2D(DistanceUnits.MILLIMETER, x, y)
-fun inchVector(x: Double = 0.0, y: Double = 0.0) = Vector2D(DistanceUnits.INCH, x, y)
-fun meterVector(x: Double = 0.0, y: Double = 0.0) = Vector2D(DistanceUnits.METER, x, y)
-fun footVector(x: Double = 0.0, y: Double = 0.0) = Vector2D(DistanceUnits.FOOT, x, y)

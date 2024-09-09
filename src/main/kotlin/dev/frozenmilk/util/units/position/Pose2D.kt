@@ -1,97 +1,98 @@
 package dev.frozenmilk.util.units.position
 
-import dev.frozenmilk.util.units.distance.DistanceUnit
-import dev.frozenmilk.util.units.distance.DistanceUnits
 import dev.frozenmilk.util.units.angle.Angle
 import dev.frozenmilk.util.units.angle.AngleUnit
 import dev.frozenmilk.util.units.angle.AngleUnits
 import dev.frozenmilk.util.units.angle.Wrapping
-import java.util.Objects
 
-class Pose2D @JvmOverloads constructor(val vector2D: Vector2D = Vector2D(), val heading: Angle = Angle(AngleUnits.RADIAN, Wrapping.WRAPPING)) {
+abstract class Pose2D<T, VEC: Vector2D<T, VEC>, SELF: Pose2D<T, VEC, SELF>> {
+	abstract val vector2D: VEC
+	abstract val heading: Angle
+
 	operator fun component1() = vector2D
 	operator fun component2() = heading
-	/**
-	 * non-mutating
-	 */
-	fun into(xUnit: DistanceUnit, yUnit: DistanceUnit, headingUnit: AngleUnit, headingWrapping: Wrapping) = Pose2D(vector2D.into(xUnit, yUnit), heading.into(headingUnit).into(headingWrapping))
-	/**
-	 * non-mutating
-	 */
-	fun into(xUnit: DistanceUnit, yUnit: DistanceUnit = xUnit) = Pose2D(vector2D.into(xUnit, yUnit), heading)
-	/**
-	 * non-mutating
-	 */
-	fun into(headingUnit: AngleUnit, headingWrapping: Wrapping = heading.wrapping) = Pose2D(vector2D, heading.into(headingUnit).into(headingWrapping))
-	/**
-	 * non-mutating
-	 */
-	fun into(headingWrapping: Wrapping) = Pose2D(vector2D, heading.into(headingWrapping))
 
 	/**
 	 * non-mutating
 	 */
-	operator fun plus(pose2D: Pose2D) = Pose2D(vector2D + pose2D.vector2D, heading + pose2D.heading)
+	abstract fun into(
+		headingUnit: AngleUnit,
+		headingWrapping: Wrapping
+	): SELF
+
+	abstract fun into(
+		headingUnit: AngleUnit
+	): SELF
 
 	/**
 	 * non-mutating
 	 */
-	operator fun plus(vector2D: Vector2D) = Pose2D(this.vector2D + vector2D, heading)
+	abstract fun into(headingWrapping: Wrapping): SELF
 
 	/**
 	 * non-mutating
 	 */
-	operator fun plus(heading: Angle) = Pose2D(vector2D, this.heading + heading)
+	abstract operator fun plus(pose2D: SELF): SELF
 
 	/**
 	 * non-mutating
 	 */
-	operator fun minus(pose2D: Pose2D) = Pose2D(this.vector2D - pose2D.vector2D, this.heading - pose2D.heading)
+	abstract operator fun plus(vector2D: VEC): SELF
 
 	/**
 	 * non-mutating
 	 */
-	operator fun minus(vector2D: Vector2D) = Pose2D(this.vector2D - vector2D, heading)
+	abstract operator fun plus(heading: Angle): SELF
+
+	/**
+	 * non-mutating
+	 */
+	abstract operator fun minus(pose2D: SELF): SELF
+
+	/**
+	 * non-mutating
+	 */
+	abstract operator fun minus(vector2D: VEC): SELF
+
+	/**
+	 * non-mutating
+	 */
+	abstract operator fun minus(heading: Angle): SELF
+
+	/**
+	 * non-mutating
+	 */
+	abstract operator fun times(scalar: Double): SELF
+
+	/**
+	 * non-mutating
+	 */
+	abstract operator fun div(scalar: Double): SELF
 
 	/**
 	 * non-mutating
 	 *
 	 * has no effect
 	 */
-	operator fun unaryPlus() = this
+	abstract operator fun unaryPlus(): SELF
 
 	/**
 	 * non-mutating
 	 *
 	 * equivalent of rotating the vector 180 degrees, and rotating the heading 180 degrees
 	 */
-	operator fun unaryMinus() = Pose2D(-vector2D, -heading)
+	abstract operator fun unaryMinus(): SELF
 
-	override fun toString() = "$vector2D, $heading"
+	abstract override fun toString(): String
 
-	override fun equals(other: Any?) = other is Pose2D && vector2D == other.vector2D && heading == other.heading
+	abstract override fun equals(other: Any?): Boolean
 
-	override fun hashCode() = Objects.hash(vector2D, heading)
+	abstract override fun hashCode(): Int
 
-	// quick intos (vector)
-	fun intoMillimeters() = into(DistanceUnits.MILLIMETER)
-	fun intoInches() = into(DistanceUnits.INCH)
-	fun intoFeet() = into(DistanceUnits.FOOT)
-	fun intoMeters() = into(DistanceUnits.METER)
 	// quick intos (heading)
 	fun intoDegrees() = into(AngleUnits.DEGREE)
 	fun intoRadians() = into(AngleUnits.RADIAN)
 	fun intoWrapping() = into(Wrapping.WRAPPING)
+	fun intoRelative() = into(Wrapping.RELATIVE)
 	fun intoLinear() = into(Wrapping.LINEAR)
-
 }
-
-fun millimeterPose(x: Double = 0.0, y: Double = 0.0, heading: Angle = Angle(AngleUnits.RADIAN, Wrapping.WRAPPING)) = Pose2D(millimeterVector(x, y), heading)
-fun inchPose(x: Double = 0.0, y: Double = 0.0, heading: Angle = Angle(AngleUnits.RADIAN, Wrapping.WRAPPING)) = Pose2D(inchVector(x, y), heading)
-fun meterPose(x: Double = 0.0, y: Double = 0.0, heading: Angle = Angle(AngleUnits.RADIAN, Wrapping.WRAPPING)) = Pose2D(meterVector(x, y), heading)
-fun footPose(x: Double = 0.0, y: Double = 0.0, heading: Angle = Angle(AngleUnits.RADIAN, Wrapping.WRAPPING)) = Pose2D(footVector(x, y), heading)
-
-fun millimeterPose(vector2D: Vector2D = millimeterVector(), heading: Angle = Angle(AngleUnits.RADIAN, Wrapping.WRAPPING)) = Pose2D(vector2D.into(DistanceUnits.MILLIMETER), heading)
-fun inchPose(vector2D: Vector2D = inchVector(), heading: Angle = Angle(AngleUnits.RADIAN, Wrapping.WRAPPING)) = Pose2D(vector2D.into(DistanceUnits.INCH), heading)
-fun meterPose(vector2D: Vector2D = meterVector(), heading: Angle = Angle(AngleUnits.RADIAN, Wrapping.WRAPPING)) = Pose2D(vector2D.into(DistanceUnits.MILLIMETER), heading)
-fun footPose(vector2D: Vector2D = footVector(), heading: Angle = Angle(AngleUnits.RADIAN, Wrapping.WRAPPING)) = Pose2D(vector2D.into(DistanceUnits.MILLIMETER), heading)
