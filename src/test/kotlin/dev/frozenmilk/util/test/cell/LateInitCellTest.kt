@@ -34,11 +34,11 @@ class LateInitCellTest {
 	@Test
 	fun uninitialised() {
 		Assert.assertEquals(null, cell.safeGet())
-		Assert.assertEquals(false, cell.initialised())
+		Assert.assertEquals(false, cell.initialised)
 		cell.accept("")
-		Assert.assertEquals(true, cell.initialised())
+		Assert.assertEquals(true, cell.initialised)
 		cell.invalidate()
-		Assert.assertEquals(false, cell.initialised())
+		Assert.assertEquals(false, cell.initialised)
 	}
 
 	@Test
