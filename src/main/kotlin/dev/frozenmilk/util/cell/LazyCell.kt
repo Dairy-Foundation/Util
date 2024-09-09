@@ -39,7 +39,7 @@ open class LazyCell<T> (private val supplier: Supplier<T>) : LateInitCell<T>(err
 	 * [evaluate] but doesn't run if the cell has contents
 	 */
 	fun safeEvaluate() {
-		if (initialised()) return
+		if (initialised) return
 		evaluate()
 	}
 

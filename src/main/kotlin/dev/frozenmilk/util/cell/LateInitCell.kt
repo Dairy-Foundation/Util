@@ -38,7 +38,7 @@ open class LateInitCell<T> @JvmOverloads constructor(protected open var ref: T? 
 		}
 	}
 
-	fun initialised() = ref != null
+	val initialised: Boolean get() = ref != null
 
 	/**
 	 * applies the function and returns the result if the internals are already initialised, else return null
