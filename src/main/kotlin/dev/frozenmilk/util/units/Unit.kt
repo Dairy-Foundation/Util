@@ -39,6 +39,8 @@ abstract class ReifiedUnit<U: Unit<U>, RU: ReifiedUnit<U, RU>>(val unit: U, val 
 	abstract operator fun minus(reifiedUnit: RU): RU
 	/**
 	 * non-mutating
+	 *
+	 * a no-op
 	 */
 	abstract operator fun unaryPlus(): RU
 	/**
@@ -63,6 +65,30 @@ abstract class ReifiedUnit<U: Unit<U>, RU: ReifiedUnit<U, RU>>(val unit: U, val 
 	abstract operator fun div(divisor: RU): RU
 	/**
 	 * non-mutating
+	 *
+	 * the same as [rem]
+	 */
+	fun mod(divisor: Double) = rem(divisor)
+	/**
+	 * non-mutating
+	 *
+	 * the same as [rem]
+	 */
+	fun mod(divisor: RU) = rem(divisor)
+	/**
+	 * non-mutating
+	 *
+	 * the same as [mod]
+	 */
+	abstract operator fun rem(divisor: Double): RU
+	/**
+	 * non-mutating
+	 *
+	 * the same as [mod]
+	 */
+	abstract operator fun rem(divisor: RU): RU
+	/**
+	 * non-mutating
 	 */
 	abstract fun pow(n: Double): RU
 	/**
@@ -77,6 +103,10 @@ abstract class ReifiedUnit<U: Unit<U>, RU: ReifiedUnit<U, RU>>(val unit: U, val 
 	 * non-mutating
 	 */
 	abstract val absoluteValue: RU
+	/**
+	 * non-mutating
+	 */
+	abstract val sign: Double
 	/**
 	 * returns the error difference this and [target], for some units, this may be the same as target - this
 	 */
