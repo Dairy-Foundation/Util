@@ -36,7 +36,7 @@ publishing {
 		register<MavenPublication>("release") {
 			groupId = "dev.frozenmilk.dairy"
 			artifactId = "Util"
-			version = "1.0.0"
+			version = "1.0.1"
 
 			afterEvaluate {
 				from(components["kotlin"])
