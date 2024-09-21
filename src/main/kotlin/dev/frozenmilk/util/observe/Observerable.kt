@@ -15,4 +15,14 @@ interface Observerable<T> : Observable<T>, Observer<T> {
 		bind(observerable)
 		observerable.bind(this)
 	}
+
+	/**
+	 * [unbind]s [observerable] from this
+	 *
+	 * then [unbind]s this from [observerable]
+	 *
+	 * @return true if either binding was removed
+	 */
+	// note, not short circuiting or
+	fun unbindBoth(observerable: Observerable<T>) = unbind(observerable) or observerable.unbind(this)
 }

@@ -2,7 +2,6 @@ package dev.frozenmilk.util.cell
 
 import dev.frozenmilk.util.observe.Observer
 import dev.frozenmilk.util.observe.Observerable
-import java.lang.ref.WeakReference
 import java.util.function.Function
 
 open class LateInitCell<T> @JvmOverloads constructor(protected open var ref: T? = null, protected val error: String = "Attempted to obtain a null value from an unsafe Cell") : CellBase<T>(), Observerable<T?> {
@@ -23,7 +22,7 @@ open class LateInitCell<T> @JvmOverloads constructor(protected open var ref: T? 
 		lastSet = System.nanoTime()
 		ref = p0
 		observers.forEach {
-			it.get()?.update(ref)
+			it.update(ref)
 		}
 	}
 
@@ -34,7 +33,7 @@ open class LateInitCell<T> @JvmOverloads constructor(protected open var ref: T? 
 		lastSet = System.nanoTime()
 		ref = null
 		observers.forEach {
-			it.get()?.update(null)
+			it.update(null)
 		}
 	}
 
@@ -47,14 +46,15 @@ open class LateInitCell<T> @JvmOverloads constructor(protected open var ref: T? 
 	 */
 	fun <R> safeInvoke(fn: Function<T, R>): R? = ref?.let(fn::apply)
 
-	private val observers = mutableSetOf<WeakReference<Observer<in T?>>>()
+	private val observers = mutableSetOf<Observer<in T?>>()
 
 	final override fun bind(observer: Observer<in T?>) {
 		if (observer == this) throw IllegalArgumentException("Self binding is illegal")
-		observers.removeIf { it.get() == null }
-		observers.add(WeakReference(observer))
+		observers.add(observer)
 		observer.update(ref)
 	}
+
+	final override fun unbind(observer: Observer<in T?>) = observers.remove(observer)
 
 	final override fun update(new: T?) {
 		if (new != ref) { // ensures no cyclic operations

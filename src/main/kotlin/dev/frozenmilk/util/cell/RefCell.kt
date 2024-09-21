@@ -2,7 +2,6 @@ package dev.frozenmilk.util.cell
 
 import dev.frozenmilk.util.observe.Observer
 import dev.frozenmilk.util.observe.Observerable
-import java.lang.ref.WeakReference
 
 open class RefCell<T> (protected var ref: T) : CellBase<T>(), Observerable<T> {
 	override fun get(): T {
@@ -13,18 +12,19 @@ open class RefCell<T> (protected var ref: T) : CellBase<T>(), Observerable<T> {
 		lastSet = System.nanoTime()
 		ref = p0
 		observers.forEach {
-			it.get()?.update(ref)
+			it.update(ref)
 		}
 	}
 
-	protected val observers = mutableSetOf<WeakReference<Observer<in T>>>()
+	private val observers = mutableSetOf<Observer<in T>>()
 
 	override fun bind(observer: Observer<in T>) {
 		if (observer == this) throw IllegalArgumentException("Self binding is illegal")
-		observers.removeIf { it.get() == null }
-		observers.add(WeakReference(observer))
+		observers.add(observer)
 		observer.update(ref)
 	}
+
+	override fun unbind(observer: Observer<in T>) = observers.remove(observer)
 
 	override fun update(new: T) {
 		if (new != ref) accept(new) // ensures no cyclic operations
