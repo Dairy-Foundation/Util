@@ -25,7 +25,7 @@ enum class AngleUnits(override val toCommonRatio: Double, override val wrapAt: D
 	RADIAN(1.0, Math.PI * 2, ),
 	DEGREE(Math.PI / 180.0, 360.0);
 
-	override val relativeAt: Double = wrapAt - (0.5 * wrapAt)
+	override val relativeAt: Double = 0.5 * wrapAt
 }
 
 enum class Wrapping {
@@ -39,7 +39,7 @@ enum class Wrapping {
 	 * the domain [-0.5, 0.5) rotations | [-PI, PI) radians | [-180, 180) degrees
 	 */
 	RELATIVE {
-		override fun wrap(value: Double, unit: AngleUnit) = value.mod(unit.wrapAt) - unit.relativeAt
+		override fun wrap(value: Double, unit: AngleUnit) = (value + unit.relativeAt).mod(unit.wrapAt) - unit.relativeAt
 	},
 	/**
 	 * unbounded domain
@@ -97,16 +97,7 @@ constructor(
 	 * [Wrapping.WRAPPING], [Wrapping.RELATIVE] -> [Wrapping.RELATIVE], these two will determine the shortest distance to the target angle
 	 */
 	override fun findError(target: Angle): Angle {
-		return when (target.wrapping) {
-			Wrapping.LINEAR -> Angle(unit, Wrapping.LINEAR, target[unit] - value)
-			Wrapping.WRAPPING, Wrapping.RELATIVE -> {
-				val difference: Double = Wrapping.WRAPPING.wrap(target[unit] - this.value, unit)
-				if (difference > (unit.wrapAt / 2.0)) {
-					return Angle(unit, Wrapping.LINEAR, -unit.wrapAt + difference)
-				}
-				return Angle(unit, Wrapping.RELATIVE, difference)
-			}
-		}
+		return Angle(unit, if (target.wrapping == Wrapping.LINEAR) Wrapping.LINEAR else Wrapping.RELATIVE, target[unit] - value)
 	}
 	override fun coerceAtLeast(minimumValue: Angle) = if (minimumValue[unit] < value) this else minimumValue.into(unit)
 	override fun coerceAtMost(maximumValue: Angle) = if (maximumValue[unit] > value) this else maximumValue.into(unit)
