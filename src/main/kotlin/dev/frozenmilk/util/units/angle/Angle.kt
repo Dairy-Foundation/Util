@@ -36,10 +36,10 @@ enum class Wrapping {
 		override fun wrap(value: Double, unit: AngleUnit) = value.mod(unit.wrapAt)
 	},
 	/**
-	 * the domain [-0.5, 0.5) rotations | [-PI, PI) radians | [-180, 180) degrees
+	 * the domain (-0.5, 0.5] rotations | (-PI, PI] radians | (-180, 180] degrees
 	 */
 	RELATIVE {
-		override fun wrap(value: Double, unit: AngleUnit) = (value + unit.relativeAt).mod(unit.wrapAt) - unit.relativeAt
+		override fun wrap(value: Double, unit: AngleUnit) = unit.relativeAt - ((unit.relativeAt - value).mod(unit.wrapAt))
 	},
 	/**
 	 * unbounded domain
