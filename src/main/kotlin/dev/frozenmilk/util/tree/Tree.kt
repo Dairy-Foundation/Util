@@ -1,7 +1,6 @@
 package dev.frozenmilk.util.tree
 
 import java.util.function.BiConsumer
-import java.util.function.Consumer
 import java.util.function.Function
 
 open class Tree<K, V> (open var contents: V) {
