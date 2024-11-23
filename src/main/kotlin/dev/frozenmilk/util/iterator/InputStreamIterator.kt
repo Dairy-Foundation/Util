@@ -2,9 +2,11 @@ package dev.frozenmilk.util.iterator
 
 import java.io.InputStream
 
-class InputStreamIterator(private val inputStream: InputStream) : Iterator<Int> {
+class InputStreamIterator(private val inputStream: InputStream) : IntIterator() {
+
 	private var peeked = false
 	private var current = EMPTY
+
 	override fun hasNext(): Boolean {
 		if (!peeked) {
 			peeked = true
@@ -13,7 +15,7 @@ class InputStreamIterator(private val inputStream: InputStream) : Iterator<Int> 
 		return current != EMPTY
 	}
 
-	override fun next(): Int {
+	override fun nextInt(): Int {
 		if (peeked) {
 			peeked = false
 			return current
