@@ -24,8 +24,18 @@ dependencies {
 publishing {
 	repositories {
 		maven {
-			name = "Dairy"
+			name = "Release"
 			url = uri("https://repo.dairy.foundation/releases")
+			credentials(PasswordCredentials::class)
+			authentication {
+				create<BasicAuthentication>("basic")
+			}
+		}
+	}
+	repositories {
+		maven {
+			name = "Snapshot"
+			url = uri("https://repo.dairy.foundation/snapshots")
 			credentials(PasswordCredentials::class)
 			authentication {
 				create<BasicAuthentication>("basic")
