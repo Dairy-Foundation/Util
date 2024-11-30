@@ -1,17 +1,18 @@
 plugins {
+	id("org.jetbrains.kotlin.jvm") version "2.0.21"
 	id("java-library")
-	id("org.jetbrains.kotlin.jvm")
 	id("maven-publish")
+}
+
+repositories {
+	mavenCentral()
+	google()
 }
 
 group = "dev.frozenmilk.util"
 
-java {
-	sourceCompatibility = JavaVersion.VERSION_1_8
-	targetCompatibility = JavaVersion.VERSION_1_8
-}
-
 kotlin {
+	jvmToolchain(8)
 	compilerOptions {
 		freeCompilerArgs.add("-Xjvm-default=all")
 	}
@@ -46,7 +47,7 @@ publishing {
 		register<MavenPublication>("release") {
 			groupId = "dev.frozenmilk.dairy"
 			artifactId = "Util"
-			version = "1.0.2"
+			version = "1.1.0"
 
 			afterEvaluate {
 				from(components["kotlin"])
