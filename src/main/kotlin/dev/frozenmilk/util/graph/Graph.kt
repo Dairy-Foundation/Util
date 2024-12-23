@@ -6,21 +6,21 @@ interface Graph<NODE: Any> {
 	/**
 	 * the members of the graph
 	 */
-	val members: Set<NODE>
+	val nodes: Set<NODE>
 
 	/**
-	 * returns the [DependencySet] for [dependent] if it exists
+	 * returns the [AdjacencySet] for [dependent] if it exists
 	 */
-	operator fun get(dependent: NODE): DependencySet<NODE>
+	operator fun get(dependent: NODE): AdjacencySet<in NODE>?
 
-	interface DependencySet<NODE> {
+	interface AdjacencySet<NODE> {
 		/**
-		 * adds [dependency] to this
+		 * adds [node] to this
 		 */
-		operator fun plus(dependency: NODE): DependencySet<NODE>
+		operator fun plus(node: NODE): AdjacencySet<NODE>
 		/**
-		 * adds [dependencies] to this
+		 * adds [nodes] to this
 		 */
-		operator fun plus(dependencies: Collection<NODE>): DependencySet<NODE>
+		operator fun plus(nodes: Collection<NODE>): AdjacencySet<NODE>
 	}
 }

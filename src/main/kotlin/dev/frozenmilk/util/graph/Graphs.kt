@@ -22,7 +22,7 @@ fun <CTX: Any, NODE: Any> Set<NODE>.reduceByContext(
 }
 
 @JvmOverloads
-fun <NODE: Any> Set<NODE>.emitGraph(adjacencyRuleSelector: Function<NODE, AdjacencyRule<NODE>>, graphImpl: GraphImpl<NODE> = GraphImpl()): GraphImpl<NODE> {
+fun <NODE: Any> Set<NODE>.emitGraph(graphImpl: GraphImpl<NODE> = GraphImpl(), adjacencyRuleSelector: Function<NODE, AdjacencyRule<NODE, in Graph<NODE>>>): GraphImpl<NODE> {
 	graphImpl.initForSet(this)
 	forEach { adjacencyRuleSelector.apply(it)(graphImpl) }
 	return graphImpl
@@ -32,8 +32,8 @@ fun <NODE: Any> GraphImpl<NODE>.sort(): List<NODE> {
 	val stack = ArrayList<NODE>(size)
 	val visited = LinkedHashSet<NODE>(size)
 
-	val nodes = this.members.toMutableSet()
-	while (nodes.size > 0) {
+	val nodes = this.nodes.toMutableSet()
+	while (nodes.isNotEmpty()) {
 		val iter = nodes.iterator()
 		val size = nodes.size
 		while (iter.hasNext()) {
@@ -46,6 +46,29 @@ fun <NODE: Any> GraphImpl<NODE>.sort(): List<NODE> {
 			}
 		}
 		check(nodes.size != size) { "Cycle detected in DAG, all remaining elements are in cycle(s). These were:\n$nodes" }
+	}
+
+	return stack
+}
+
+fun <NODE: Any> GraphImpl<NODE>.sortAndRemoveCycles(): List<NODE> {
+	val stack = ArrayList<NODE>(size)
+	val visited = LinkedHashSet<NODE>(size)
+
+	val nodes = this.nodes.toMutableSet()
+	while (nodes.isNotEmpty()) {
+		val iter = nodes.iterator()
+		val size = nodes.size
+		while (iter.hasNext()) {
+			val node = iter.next()
+			if (visited.containsAll(this.map[node]!!.set)) {
+				visited.add(node)
+				stack.add(node)
+
+				iter.remove()
+			}
+		}
+		if (nodes.size == size) break
 	}
 
 	return stack

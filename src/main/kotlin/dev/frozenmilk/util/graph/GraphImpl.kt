@@ -1,17 +1,17 @@
 package dev.frozenmilk.util.graph
 
-class GraphImpl<NODE: Any> @JvmOverloads constructor(val map: MutableMap<NODE, DependencySetImpl> = mutableMapOf()) : Graph<NODE> {
+class GraphImpl<NODE: Any> @JvmOverloads constructor(val map: MutableMap<NODE, AdjacencySetImpl> = mutableMapOf()) : Graph<NODE> {
 	fun initForSet(set: Set<NODE>) {
 		map.keys.removeAll(map.keys - set)
 		set.forEach {
-			map.getOrPut(it) { DependencySetImpl(mutableSetOf()) }.set.clear()
+			map.getOrPut(it) { AdjacencySetImpl(it, mutableSetOf()) }.set.clear()
 		}
 	}
 	fun initForMap(map: Map<NODE, MutableSet<NODE>>) {
 		this.map.keys.removeAll(this.map.keys - map.keys)
-		map.forEach { (node, dependencies) -> this.map[node] = DependencySetImpl(dependencies) }
+		map.forEach { (node, dependencies) -> this.map[node] = AdjacencySetImpl(node, dependencies) }
 	}
-	constructor(set: Set<NODE>): this(mutableMapOf<NODE, DependencySetImpl>()) {
+	constructor(set: Set<NODE>): this(mutableMapOf<NODE, AdjacencySetImpl>()) {
 		initForSet(set)
 	}
 
@@ -20,25 +20,20 @@ class GraphImpl<NODE: Any> @JvmOverloads constructor(val map: MutableMap<NODE, D
 	/**
 	 * the members of the graph
 	 */
-	override val members = map.keys as Set<NODE>
+	override val nodes = map.keys as Set<NODE>
 
 	/**
-	 * returns the [DependencySet] for [dependent] if it exists
+	 * returns the [AdjacencySet] for [node] if it exists
 	 */
-	override operator fun get(dependent: NODE) = map[dependent] as Graph.DependencySet<NODE>
+	override operator fun get(node: NODE) = map[node]
 
-	inner class DependencySetImpl(val set: MutableSet<NODE>): Graph.DependencySet<NODE> {
-		/**
-		 * adds [dependency] to this
-		 */
-		override operator fun plus(dependency: NODE) = apply {
-			set.add(dependency)
+	inner class AdjacencySetImpl(val node: NODE, val set: MutableSet<NODE>): Graph.AdjacencySet<NODE> {
+		override operator fun plus(node: NODE) = apply {
+			if (node != this.node) set.add(node)
 		}
-		/**
-		 * adds [dependencies] to this
-		 */
-		override operator fun plus(dependencies: Collection<NODE>) = apply {
-			set.addAll(dependencies)
+		override operator fun plus(nodes: Collection<NODE>) = apply {
+			if (nodes.contains(node)) set.addAll(nodes - node)
+			else set.addAll(nodes)
 		}
 	}
 }

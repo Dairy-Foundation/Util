@@ -9,7 +9,7 @@ import java.lang.Runnable
 fun interface NonCapturingContextRule<CTX: Any> : ContextRule<Unit, CTX> {
 	override fun invokeAndResolve(context: CTX) = this(context)?.let { resolve(); true } ?: run { fail(); false }
 
-	infix fun <AND : Any> and(and: CapturingContextRule<AND, CTX>): CapturingContextRule<AND, CTX> = object : CapturingContextRule<AND, CTX> {
+	infix fun <AND : Any> and(and: CapturingContextRule<AND, in CTX>): CapturingContextRule<AND, CTX> = object : CapturingContextRule<AND, CTX> {
 		override fun invoke(context: CTX) = this@NonCapturingContextRule(context)?.let { and.invoke(context) }
 
 		override fun resolve(result: AND) {
@@ -23,7 +23,7 @@ fun interface NonCapturingContextRule<CTX: Any> : ContextRule<Unit, CTX> {
 		}
 	}
 
-	infix fun <OR : Any> or(or: CapturingContextRule<OR, CTX>): CapturingContextRule<Box<OR?>, CTX> = object : CapturingContextRule<Box<OR?>, CTX> {
+	infix fun <OR : Any> or(or: CapturingContextRule<OR, in CTX>): CapturingContextRule<Box<OR?>, CTX> = object : CapturingContextRule<Box<OR?>, CTX> {
 		override fun invoke(context: CTX): Box<OR?>? = this@NonCapturingContextRule(context)?.let {
 			Box<OR?>(
 				null
@@ -47,7 +47,7 @@ fun interface NonCapturingContextRule<CTX: Any> : ContextRule<Unit, CTX> {
 
 	}
 
-	infix fun and(and: NonCapturingContextRule<CTX>): NonCapturingContextRule<CTX> = object : NonCapturingContextRule<CTX> {
+	infix fun and(and: NonCapturingContextRule<in CTX>): NonCapturingContextRule<CTX> = object : NonCapturingContextRule<CTX> {
 		override fun invoke(context: CTX) = this@NonCapturingContextRule(context)?.let { and.invoke(context) }
 
 		override fun resolve() {
@@ -61,7 +61,7 @@ fun interface NonCapturingContextRule<CTX: Any> : ContextRule<Unit, CTX> {
 		}
 	}
 
-	infix fun or(or: NonCapturingContextRule<CTX>): CapturingContextRule<Boolean, CTX> = object : CapturingContextRule<Boolean, CTX> {
+	infix fun or(or: NonCapturingContextRule<in CTX>): CapturingContextRule<Boolean, CTX> = object : CapturingContextRule<Boolean, CTX> {
 		override fun invoke(context: CTX): Boolean? = this@NonCapturingContextRule(context)?.let { true } ?: or(context)?.let { false }
 
 		override fun resolve(result: Boolean) {

@@ -10,7 +10,7 @@ import java.util.function.Consumer
 fun interface CapturingContextRule<RES: Any, CTX: Any> : ContextRule<RES, CTX> {
 	override fun invokeAndResolve(context: CTX) = this(context)?.let { resolve(it); true } ?: run { fail(); false }
 
-	infix fun <AND : Any> and(and: CapturingContextRule<AND, CTX>): CapturingContextRule<Pair<RES, AND>, CTX> = object : CapturingContextRule<Pair<RES, AND>, CTX> {
+	infix fun <AND : Any> and(and: CapturingContextRule<AND, in CTX>): CapturingContextRule<Pair<RES, AND>, CTX> = object : CapturingContextRule<Pair<RES, AND>, CTX> {
 		override fun invoke(context: CTX) = this@CapturingContextRule(context)?.let { res ->
 			and.invoke(context)?.let { andRes ->
 				res to andRes
@@ -28,7 +28,7 @@ fun interface CapturingContextRule<RES: Any, CTX: Any> : ContextRule<RES, CTX> {
 		}
 	}
 
-	infix fun <OR : Any> or(or: CapturingContextRule<OR, CTX>): CapturingContextRule<Pair<RES?, OR?>, CTX> = object : CapturingContextRule<Pair<RES?, OR?>, CTX> {
+	infix fun <OR : Any> or(or: CapturingContextRule<OR, in CTX>): CapturingContextRule<Pair<RES?, OR?>, CTX> = object : CapturingContextRule<Pair<RES?, OR?>, CTX> {
 		override fun invoke(context: CTX) =
 			this@CapturingContextRule(context)?.let { res -> res to null } ?:
 			or(context)?.let { res -> null to res }
@@ -50,7 +50,7 @@ fun interface CapturingContextRule<RES: Any, CTX: Any> : ContextRule<RES, CTX> {
 		}
 	}
 
-	infix fun and(and: NonCapturingContextRule<CTX>): CapturingContextRule<RES, CTX> = object : CapturingContextRule<RES, CTX> {
+	infix fun and(and: NonCapturingContextRule<in CTX>): CapturingContextRule<RES, CTX> = object : CapturingContextRule<RES, CTX> {
 		override fun invoke(context: CTX) = this@CapturingContextRule(context)?.let { res -> and.invoke(context)?.let { res } }
 
 		override fun resolve(result: RES) {
@@ -64,7 +64,7 @@ fun interface CapturingContextRule<RES: Any, CTX: Any> : ContextRule<RES, CTX> {
 		}
 	}
 
-	infix fun or(or: NonCapturingContextRule<CTX>): CapturingContextRule<Box<RES?>, CTX> = object : CapturingContextRule<Box<RES?>, CTX> {
+	infix fun or(or: NonCapturingContextRule<in CTX>): CapturingContextRule<Box<RES?>, CTX> = object : CapturingContextRule<Box<RES?>, CTX> {
 		override fun invoke(context: CTX): Box<RES?>? =
 			this@CapturingContextRule(context)?.let { res -> Box<RES?>(res) } ?:
 			or(context)?.let { Box<RES?>(null) }

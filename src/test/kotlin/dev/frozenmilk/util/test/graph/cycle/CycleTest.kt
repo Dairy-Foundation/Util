@@ -13,7 +13,7 @@ class CycleTest {
 	@Test
 	fun simpleCycle() {
 		Assert.assertThrows(IllegalStateException::class.java, ThrowingRunnable {
-			setOf(One, Two).emitGraph({ it.adjacencyRule }).sort()
+			setOf(One, Two).emitGraph { it.adjacencyRule }.sort()
 		})
 	}
 }

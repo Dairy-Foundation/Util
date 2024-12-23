@@ -1,3 +1,5 @@
+@file:Suppress("unused")
+@file:JvmName("ContextRules")
 package dev.frozenmilk.util.graph.rule
 
 import java.lang.Class
