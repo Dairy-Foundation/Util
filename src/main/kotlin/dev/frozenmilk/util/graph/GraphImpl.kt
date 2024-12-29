@@ -1,6 +1,6 @@
 package dev.frozenmilk.util.graph
 
-class GraphImpl<NODE: Any> @JvmOverloads constructor(val map: MutableMap<NODE, AdjacencySetImpl> = mutableMapOf()) : Graph<NODE> {
+class GraphImpl<NODE: Any> @JvmOverloads constructor(val map: MutableMap<NODE, GraphImpl<NODE>.AdjacencySetImpl> = mutableMapOf()) : Graph<NODE> {
 	fun initForSet(set: Set<NODE>) {
 		map.keys.removeAll(map.keys - set)
 		set.forEach {

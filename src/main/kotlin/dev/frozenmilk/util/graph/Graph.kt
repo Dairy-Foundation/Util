@@ -9,9 +9,9 @@ interface Graph<NODE: Any> {
 	val nodes: Set<NODE>
 
 	/**
-	 * returns the [AdjacencySet] for [dependent] if it exists
+	 * returns the [AdjacencySet] for [node] if it exists
 	 */
-	operator fun get(dependent: NODE): AdjacencySet<in NODE>?
+	operator fun get(node: NODE): AdjacencySet<in NODE>?
 
 	interface AdjacencySet<NODE> {
 		/**
