@@ -42,6 +42,7 @@ captures/
 # IntelliJ
 *.iml
 .idea/
+.kotlin/
 
 # For Mac users
 .DS_Store
