@@ -1,6 +1,5 @@
 package dev.frozenmilk.util.test.graph.cycle
 
-import dev.frozenmilk.util.graph.rule.AdjacencyRule
 import dev.frozenmilk.util.graph.rule.dependsOn
 import dev.frozenmilk.util.graph.emitGraph
 import dev.frozenmilk.util.graph.sort
@@ -12,9 +11,9 @@ import org.junit.function.ThrowingRunnable
 class CycleTest {
 	@Test
 	fun simpleCycle() {
-		Assert.assertThrows(IllegalStateException::class.java, ThrowingRunnable {
+		Assert.assertThrows(IllegalStateException::class.java) {
 			setOf(One, Two).emitGraph { it.adjacencyRule }.sort()
-		})
+		}
 	}
 }
 
