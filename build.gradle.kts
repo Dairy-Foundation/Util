@@ -1,5 +1,5 @@
 plugins {
-	id("dev.frozenmilk.jvm-library") version "10.1.1-0.1.2"
+	id("dev.frozenmilk.jvm-library") version "10.1.1-0.1.3"
 	id("dev.frozenmilk.publish") version "0.0.4"
 	id("dev.frozenmilk.doc") version "0.0.4"
 }
