@@ -7,5 +7,5 @@ fun interface Observer<T> {
 	 *
 	 * [new] should not be equal to the last [new] value
 	 */
-	fun update(new: T)
+	fun update(source: Observable<*>, new: T)
 }

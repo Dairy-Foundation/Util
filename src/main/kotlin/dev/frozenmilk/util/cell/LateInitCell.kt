@@ -1,5 +1,6 @@
 package dev.frozenmilk.util.cell
 
+import dev.frozenmilk.util.observe.Observable
 import dev.frozenmilk.util.observe.Observer
 import dev.frozenmilk.util.observe.Observerable
 import java.util.function.Function
@@ -18,13 +19,15 @@ open class LateInitCell<T> @JvmOverloads constructor(protected open var ref: T? 
 		return ref
 	}
 
-	final override fun accept(p0: T) {
+	private fun accept(source: Observable<*>, p0: T) {
 		lastSet = System.nanoTime()
 		ref = p0
 		observers.forEach {
-			it.update(ref)
+			it.update(source, ref)
 		}
 	}
+
+	final override fun accept(p0: T) = accept(this, p0)
 
 	/**
 	 * causes the next attempt to get the contents of the cell to fail
@@ -33,7 +36,7 @@ open class LateInitCell<T> @JvmOverloads constructor(protected open var ref: T? 
 		lastSet = System.nanoTime()
 		ref = null
 		observers.forEach {
-			it.update(null)
+			it.update(this, null)
 		}
 	}
 
@@ -51,15 +54,15 @@ open class LateInitCell<T> @JvmOverloads constructor(protected open var ref: T? 
 	final override fun bind(observer: Observer<in T?>) {
 		if (observer == this) throw IllegalArgumentException("Self binding is illegal")
 		observers.add(observer)
-		observer.update(ref)
+		observer.update(this, ref)
 	}
 
 	final override fun unbind(observer: Observer<in T?>) = observers.remove(observer)
 
-	final override fun update(new: T?) {
-		if (new != ref) { // ensures no cyclic operations
+	final override fun update(source: Observable<*>, new: T?) {
+		if (source != this) { // ensures no cyclic operations
 			if (new == null) invalidate()
-			else accept(new)
+			else accept(source, new)
 		}
 	}
 

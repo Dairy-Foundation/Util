@@ -35,7 +35,7 @@ class Observation {
 		Assert.assertEquals(null, c2.safeGet())
 		c1.bind(c2)
 		// this bind won't run if the arg is null
-		c2.bind { c1.update(it ?: return@bind) }
+		c2.bind { source, new -> c1.update(source, new ?: return@bind) }
 		Assert.assertEquals("start", c2.get())
 		c2.accept("end")
 		Assert.assertEquals("end", c1.get())
