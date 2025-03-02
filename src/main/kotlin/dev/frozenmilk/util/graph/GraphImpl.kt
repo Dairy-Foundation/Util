@@ -1,6 +1,8 @@
 package dev.frozenmilk.util.graph
 
-class GraphImpl<NODE: Any> @JvmOverloads constructor(val map: MutableMap<NODE, GraphImpl<NODE>.AdjacencySetImpl> = mutableMapOf()) : Graph<NODE> {
+class GraphImpl<NODE: Any>
+@JvmOverloads
+constructor(val map: MutableMap<NODE, GraphImpl<NODE>.AdjacencySetImpl> = mutableMapOf()) : Graph<NODE> {
 	fun initForSet(set: Set<NODE>) {
 		map.keys.removeAll(map.keys - set)
 		set.forEach {
@@ -11,19 +13,18 @@ class GraphImpl<NODE: Any> @JvmOverloads constructor(val map: MutableMap<NODE, G
 		this.map.keys.removeAll(this.map.keys - map.keys)
 		map.forEach { (node, dependencies) -> this.map[node] = AdjacencySetImpl(node, dependencies) }
 	}
-	constructor(set: Set<NODE>): this(mutableMapOf<NODE, AdjacencySetImpl>()) {
-		initForSet(set)
-	}
 
-	override val size = map.size
+	override val size
+		get() = map.size
 
 	/**
 	 * the members of the graph
 	 */
-	override val nodes = map.keys as Set<NODE>
+	override val nodes
+		get() = map.keys as Set<NODE>
 
 	/**
-	 * returns the [AdjacencySet] for [node] if it exists
+	 * returns the [AdjacencySetImpl] for [node] if it exists
 	 */
 	override operator fun get(node: NODE) = map[node]
 

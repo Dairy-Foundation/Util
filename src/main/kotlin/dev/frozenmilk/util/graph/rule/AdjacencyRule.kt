@@ -7,10 +7,9 @@ import java.lang.FunctionalInterface
 fun interface AdjacencyRule<NODE: Any, GRAPH: Graph<NODE>> {
 	operator fun invoke(graph: GRAPH)
 
-	infix fun and(and: AdjacencyRule<in NODE, in GRAPH>): AdjacencyRule<NODE, GRAPH> = object : AdjacencyRule<NODE, GRAPH> {
-		override fun invoke(graph: GRAPH) {
-			this@AdjacencyRule.invoke(graph)
+	infix fun and(and: AdjacencyRule<in NODE, in GRAPH>): AdjacencyRule<NODE, GRAPH> =
+		AdjacencyRule { graph ->
+			this.invoke(graph)
 			and.invoke(graph)
 		}
-	}
 }

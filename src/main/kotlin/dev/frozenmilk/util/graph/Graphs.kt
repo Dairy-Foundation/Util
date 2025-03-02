@@ -30,6 +30,7 @@ fun <NODE: Any> Set<NODE>.emitGraph(graphImpl: GraphImpl<NODE> = GraphImpl(), ad
 
 fun <NODE: Any> GraphImpl<NODE>.sort(): List<NODE> {
 	val stack = ArrayList<NODE>(size)
+	val visitedTemp = LinkedHashSet<NODE>(size)
 	val visited = LinkedHashSet<NODE>(size)
 
 	val nodes = this.nodes.toMutableSet()
@@ -39,12 +40,14 @@ fun <NODE: Any> GraphImpl<NODE>.sort(): List<NODE> {
 		while (iter.hasNext()) {
 			val node = iter.next()
 			if (visited.containsAll(this.map[node]!!.set)) {
-				visited.add(node)
+				visitedTemp.add(node)
 				stack.add(node)
 
 				iter.remove()
 			}
 		}
+		visited.addAll(visitedTemp)
+		visitedTemp.clear()
 		check(nodes.size != size) { "Cycle detected in DAG, all remaining elements are in cycle(s). These were:\n$nodes" }
 	}
 
@@ -54,6 +57,7 @@ fun <NODE: Any> GraphImpl<NODE>.sort(): List<NODE> {
 fun <NODE: Any> GraphImpl<NODE>.sortAndRemoveCycles(): List<NODE> {
 	val stack = ArrayList<NODE>(size)
 	val visited = LinkedHashSet<NODE>(size)
+	val visitedTemp = LinkedHashSet<NODE>(size)
 
 	val nodes = this.nodes.toMutableSet()
 	while (nodes.isNotEmpty()) {
@@ -62,12 +66,14 @@ fun <NODE: Any> GraphImpl<NODE>.sortAndRemoveCycles(): List<NODE> {
 		while (iter.hasNext()) {
 			val node = iter.next()
 			if (visited.containsAll(this.map[node]!!.set)) {
-				visited.add(node)
+				visitedTemp.add(node)
 				stack.add(node)
 
 				iter.remove()
 			}
 		}
+		visited.addAll(visitedTemp)
+		visitedTemp.clear()
 		if (nodes.size == size) break
 	}
 

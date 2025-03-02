@@ -65,7 +65,7 @@ fun <NODE: Any, GRAPH: Graph<NODE>> NODE.optionalDependedOn(dependant: NODE) = A
  *
  * will crash if no [NODE]s of type [dependencyClass] exist in the graph
  */
-fun <NODE: Any, GRAPH: Graph<NODE>> NODE.dependsOnClass(dependencyClass: Class<NODE>) = AdjacencyRule<NODE, GRAPH> { graph ->
+fun <NODE: Any, GRAPH: Graph<NODE>> NODE.dependsOnClass(dependencyClass: Class<out NODE>) = AdjacencyRule<NODE, GRAPH> { graph ->
 	val instances = graph.nodes.filterIsInstance(dependencyClass)
 	check(instances.isNotEmpty()) { "$dependencyClass was not in graph" }
 	requireNotNull(graph[this]) { "$this was not in graph" }.plus(instances)
@@ -76,7 +76,7 @@ fun <NODE: Any, GRAPH: Graph<NODE>> NODE.dependsOnClass(dependencyClass: Class<N
  *
  * will crash if no [NODE]s of type [dependantClass] exist in the graph
  */
-fun <NODE: Any, GRAPH: Graph<NODE>> NODE.dependedOnClass(dependantClass: Class<NODE>) = AdjacencyRule<NODE, GRAPH> { graph ->
+fun <NODE: Any, GRAPH: Graph<NODE>> NODE.dependedOnClass(dependantClass: Class<out NODE>) = AdjacencyRule<NODE, GRAPH> { graph ->
 	checkNotNull(graph[this]) { "$this was not in graph" }
 	val instances = graph.nodes.filterIsInstance(dependantClass)
 	require(instances.isNotEmpty()) { "$dependantClass was not in graph" }
@@ -86,7 +86,7 @@ fun <NODE: Any, GRAPH: Graph<NODE>> NODE.dependedOnClass(dependantClass: Class<N
 /**
  * [this] depends on all [NODE]s of type [dependencyClass]
  */
-fun <NODE: Any, GRAPH: Graph<NODE>> NODE.optionalDependsOnClass(dependencyClass: Class<NODE>) = AdjacencyRule<NODE, GRAPH> { graph ->
+fun <NODE: Any, GRAPH: Graph<NODE>> NODE.optionalDependsOnClass(dependencyClass: Class<out NODE>) = AdjacencyRule<NODE, GRAPH> { graph ->
 	requireNotNull(graph[this]) { "$this was not in graph" } +
 			graph.nodes.filterIsInstance(dependencyClass)
 }
@@ -94,7 +94,7 @@ fun <NODE: Any, GRAPH: Graph<NODE>> NODE.optionalDependsOnClass(dependencyClass:
 /**
  * all [NODE]s of type [dependantClass] depends on [this]
  */
-fun <NODE: Any, GRAPH: Graph<NODE>> NODE.optionalDependedOnClass(dependantClass: Class<NODE>) = AdjacencyRule<NODE, GRAPH> { graph ->
+fun <NODE: Any, GRAPH: Graph<NODE>> NODE.optionalDependedOnClass(dependantClass: Class<out NODE>) = AdjacencyRule<NODE, GRAPH> { graph ->
 	checkNotNull(graph[this]) { "$this was not in graph" }
 	graph.nodes.filterIsInstance(dependantClass).forEach { graph[it]?.plus(this) }
 }
