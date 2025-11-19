@@ -1,4 +1,4 @@
-package dev.frozenmilk.util.genqueue
+package dev.frozenmilk.util.collections
 
 import java.util.function.Function
 
