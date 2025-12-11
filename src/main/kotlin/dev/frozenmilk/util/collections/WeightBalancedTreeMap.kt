@@ -142,7 +142,7 @@ class WeightBalancedTreeMap<K, V> private constructor(
             v: V,
             l: WeightBalancedTreeMap<K, V>,
             r: WeightBalancedTreeMap<K, V>?,
-        ) = if (single(l.l, l.r)) singleR(k, v, l, r)
+        ) = if (single(l.r, l.l)) singleR(k, v, l, r)
         else doubleR(k, v, l, r)
 
         private fun <K, V> singleR(
