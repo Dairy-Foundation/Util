@@ -24,8 +24,17 @@ class Q<T> {
     fun pop(): T = run {
         val head = checkNotNull(head) { "attempted to pop an empty queue" }
         val (car, cdr) = head
-        Cons.drop(head)
-        this.head = cdr
+        if (tail == head) {
+            Cons.drop(head)
+            this.head = null
+            this.tail = null
+        }
+        else {
+            Cons.drop(head)
+            this.head = cdr
+        }
         car
     }
+
+    override fun toString() = head?.toString() ?: "()"
 }

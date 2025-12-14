@@ -28,11 +28,20 @@ class LimitedQ<T>(val limit: Int) {
      * WARNING: will panic if [empty]
      */
     fun pop(): T = run {
-        val head = head!!
+        val head = checkNotNull(head) { "attempted to pop an empty queue" }
         val (car, cdr) = head
         len--
-        Cons.drop(head)
-        this.head = cdr
+        if (tail == head) {
+            Cons.drop(head)
+            this.head = null
+            this.tail = null
+        }
+        else {
+            Cons.drop(head)
+            this.head = cdr
+        }
         car
     }
+
+    override fun toString() = head?.toString() ?: "()"
 }
