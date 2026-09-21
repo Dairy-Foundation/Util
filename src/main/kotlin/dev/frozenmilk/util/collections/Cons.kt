@@ -4,6 +4,9 @@ import java.util.function.BiFunction
 import java.util.function.Consumer
 import java.util.function.Function
 import java.util.function.Predicate
+import kotlin.contracts.ExperimentalContracts
+import kotlin.contracts.InvocationKind
+import kotlin.contracts.contract
 
 /**
  * a cons cell singly linked list implementation
@@ -25,6 +28,7 @@ class Cons<T> private constructor(car: T, cdr: Cons<T>?) {
      * WARNING: this method is VERY unsafe, and should probably not be used by api consumers
      */
     @Suppress("UNCHECKED_CAST")
+    @IgnorableReturnValue
     fun <T> write(car: T, cdr: Cons<T>?) = run {
         val res = this as Cons<T>
         res.car = car
@@ -64,9 +68,11 @@ class Cons<T> private constructor(car: T, cdr: Cons<T>?) {
             }
         }
 
-        fun drop(cons: Cons<*>) = state.get().run {
-            head = cons.write(null, head)
-            len++
+        fun drop(cons: Cons<*>) {
+            state.get().run {
+                head = cons.write(null, head)
+                len++
+            }
         }
     }
 
@@ -89,6 +95,14 @@ class Cons<T> private constructor(car: T, cdr: Cons<T>?) {
         @JvmStatic
         fun <T> cons(car: T, cdr: Cons<T>?) = FreeList.pop()?.write(car, cdr) ?: Cons(car, cdr)
 
+
+        @JvmStatic
+        fun size(ls: Cons<*>?) = if (ls === null) 0
+        else size(1, ls.cdr)
+
+        private tailrec fun size(acc: Int, ls: Cons<*>?): Int = if (ls === null) acc
+        else size(acc + 1, ls.cdr)
+
         /**
          * convert list to cons
          */
@@ -98,12 +112,48 @@ class Cons<T> private constructor(car: T, cdr: Cons<T>?) {
         }
 
         /**
+         * convert list to cons
+         */
+        @JvmSynthetic
+        inline fun <T, U> mapFrom(ls: List<T>, f: (T) -> U) =
+            ls.foldRight(null as Cons<U>?) { value, cons ->
+                cons(f(value), cons)
+            }
+
+        /**
+         * convert list to cons
+         */
+        @JvmStatic
+        fun <T, U> mapFrom(ls: List<T>, f: Function<T, U>) =
+            ls.foldRight(null as Cons<U>?) { value, cons ->
+                cons(f.apply(value), cons)
+            }
+
+        /**
          * convert array to cons
          */
         @JvmStatic
         fun <T> from(arr: Array<T>) = arr.foldRight(null as Cons<T>?) { value, cons ->
             cons(value, cons)
         }
+
+        /**
+         * convert list to cons
+         */
+        @JvmSynthetic
+        inline fun <T, U> mapFrom(ls: Array<T>, f: (T) -> U) =
+            ls.foldRight(null as Cons<U>?) { value, cons ->
+                cons(f(value), cons)
+            }
+
+        /**
+         * convert list to cons
+         */
+        @JvmStatic
+        fun <T, U> mapFrom(ls: Array<T>, f: Function<T, U>) =
+            ls.foldRight(null as Cons<U>?) { value, cons ->
+                cons(f.apply(value), cons)
+            }
 
         /**
          * clone the list structure, not its contents
@@ -146,6 +196,7 @@ class Cons<T> private constructor(car: T, cdr: Cons<T>?) {
          * WARNING: consumes the head of [cons]
          */
         @JvmStatic
+        @IgnorableReturnValue
         fun drop(cons: Cons<*>) = FreeList.drop(cons)
 
         /**
@@ -501,7 +552,11 @@ class Cons<T> private constructor(car: T, cdr: Cons<T>?) {
         /**
          * applies [f] to each value of [cons]
          */
+        @OptIn(ExperimentalContracts::class)
         inline fun <T> forEach(cons: Cons<T>?, f: (T) -> Unit) {
+            contract {
+                callsInPlace(f, InvocationKind.UNKNOWN)
+            }
             var curr = cons
             while (curr != null) {
                 val (car, cdr) = curr
@@ -602,6 +657,90 @@ class Cons<T> private constructor(car: T, cdr: Cons<T>?) {
                 i++
                 curr = cdr
             }
+        }
+
+        tailrec fun <T> any(cons: Cons<T>?, f: Predicate<T>): Boolean = if (cons == null) false
+        else f.test(cons.car) || any(cons.cdr, f)
+
+        inline fun <T> any(cons: Cons<T>?, f: (T) -> Boolean): Boolean {
+            var curr = cons
+            while (curr != null) {
+                if (f(curr.car)) return true
+                curr = curr.cdr
+            }
+            return false
+        }
+
+        tailrec fun <T> all(cons: Cons<T>?, f: Predicate<T>): Boolean = if (cons == null) true
+        else f.test(cons.car) && all(cons.cdr, f)
+
+        inline fun <T> all(cons: Cons<T>?, f: (T) -> Boolean): Boolean {
+            var curr = cons
+            while (curr != null) {
+                if (!f(curr.car)) return false
+                curr = curr.cdr
+            }
+            return true
+        }
+
+        tailrec fun <T> find(cons: Cons<T>?, f: Predicate<T>): Cons<T>? = if (cons == null) null
+        else if (f.test(cons.car)) cons
+        else find(cons.cdr, f)
+
+        inline fun <T> find(cons: Cons<T>?, f: (T) -> Boolean): Cons<T>? {
+            var curr = cons
+            while (curr != null) {
+                if (!f(curr.car)) curr = curr.cdr
+            }
+            return curr
+        }
+
+        fun <T> cat(l: Cons<T>?, r: Cons<T>?): Cons<T>? =
+            if (l == null) r
+            else if (r == null) l
+            else cat(cons(l.car, null), l.cdr, r)
+
+        private tailrec fun <T> cat(prev: Cons<T>, l: Cons<T>?, r: Cons<T>): Cons<T>? =
+            if (l == null) prev.write(prev.car, r)
+            else {
+                val next = cons(l.car, null)
+                prev.write(prev.car, next)
+                cat(next, l.cdr, r)
+            }
+
+        fun <T> mutCat(l: Cons<T>?, r: Cons<T>?): Cons<T>? =
+            if (l == null) r
+            else if (r == null) l
+            else mutCat(l, l.cdr, r)
+
+        private tailrec fun <T> mutCat(prev: Cons<T>, l: Cons<T>?, r: Cons<T>): Cons<T>? =
+            if (l == null) prev.write(prev.car, r)
+            else {
+                prev.write(prev.car, l)
+                mutCat(l, l.cdr, r)
+            }
+
+        tailrec fun <T> nth(ls: Cons<T>?, n: Int): Cons<T>? = if (ls == null || n <= 0) ls
+        else nth(ls.cdr, n - 1)
+
+        tailrec fun <T> last(ls: Cons<T>): Cons<T> {
+            val cdr = ls.cdr
+            return if (cdr == null) ls
+            else last(cdr)
+        }
+
+        @Suppress("UNCHECKED_CAST")
+        inline fun <reified T> toArray(ls: Cons<T>?): Array<T> {
+            val size = size(ls)
+            val res = arrayOfNulls<T>(size)
+            var state = ls
+            var i = 0
+            while (state !== null) {
+                res[i] = state.car
+                state = state.cdr
+                i++
+            }
+            return res as Array<T>
         }
     }
 }

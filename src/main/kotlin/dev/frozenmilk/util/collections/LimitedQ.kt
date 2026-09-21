@@ -22,6 +22,17 @@ class LimitedQ<T>(val limit: Int) {
         }
     }
 
+    fun prepend(value: T) {
+        check(!full)
+        len++
+        if (tail == null) {
+            head = Cons.cons(value, null)
+            tail = head
+        } else {
+            head = Cons.cons(value, head)
+        }
+    }
+
     fun empty() = head == null
 
     /**
