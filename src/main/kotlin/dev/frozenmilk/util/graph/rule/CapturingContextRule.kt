@@ -6,7 +6,6 @@ import java.lang.Runnable
 import java.util.function.Consumer
 
 @FunctionalInterface
-@JvmDefaultWithoutCompatibility
 fun interface CapturingContextRule<RES: Any, CTX: Any> : ContextRule<RES, CTX> {
 	override fun invokeAndResolve(context: CTX) = this(context)?.let { resolve(it); true } ?: run { fail(); false }
 

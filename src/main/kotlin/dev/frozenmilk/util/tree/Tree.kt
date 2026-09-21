@@ -24,7 +24,7 @@ open class Tree<K, V> (open var contents: V) {
 	open fun getOrElse(keys: Collection<K>, orElse: Function<in K, out V>) : Tree<K, V> {
 		var treeWalker = this
 		keys.forEach {
-			treeWalker.computeIfAbsent(it, orElse)
+			val _ = treeWalker.computeIfAbsent(it, orElse)
 			treeWalker = treeWalker.children[it]!!
 		}
 		return treeWalker
@@ -38,7 +38,7 @@ open class Tree<K, V> (open var contents: V) {
 	open fun getOrDefault(keys: Collection<K>, default: V) : Tree<K, V> {
 		var treeWalker = this
 		keys.forEach {
-			treeWalker.putIfAbsent(it, default)
+			val _ = treeWalker.putIfAbsent(it, default)
 			treeWalker = treeWalker.children[it]!!
 		}
 		return treeWalker
